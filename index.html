@@ -867,14 +867,36 @@ function parseAPIGames(apiGames) {
   });
 }
 
+// -- Team abbreviation lookup --
+const TEAM_ABBREVS = {};
+
+async function loadTeamAbbrevs() {
+  try {
+    const resp = await fetch(`${MLB_API}/teams?sportId=1`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (data.teams) data.teams.forEach(t => { TEAM_ABBREVS[t.id] = t.abbreviation; TEAM_ABBREVS[t.name] = t.abbreviation; });
+  } catch(e) {}
+}
+
+function getTeamAbbrev(leader) {
+  if (leader.team) {
+    if (leader.team.abbreviation) return leader.team.abbreviation;
+    if (leader.team.id && TEAM_ABBREVS[leader.team.id]) return TEAM_ABBREVS[leader.team.id];
+    if (leader.team.name && TEAM_ABBREVS[leader.team.name]) return TEAM_ABBREVS[leader.team.name];
+    if (leader.team.teamName) return leader.team.teamName.substring(0,3).toUpperCase();
+  }
+  return '';
+}
+
 // -- Hot/Cold API fetch --
 async function fetchHotCold() {
   if (!useAPI) return;
   try {
     const season = new Date().getFullYear();
     const [hotResp, coldResp] = await Promise.all([
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=5&statType=season&gameTypes=R`),
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=5&statType=season&gameTypes=R&order=asc`)
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team`),
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&order=asc&hydrate=team`)
     ]);
     if (hotResp.ok) {
       const hotData = await hotResp.json();
@@ -883,7 +905,7 @@ async function fetchHotCold() {
         if (leaders.length > 0) {
           state.hotPlayers = leaders.map(l => ({
             name: l.person.fullName,
-            team: l.team ? l.team.abbreviation : '',
+            team: getTeamAbbrev(l),
             stat: l.value,
             label: 'AVG'
           }));
@@ -897,7 +919,7 @@ async function fetchHotCold() {
         if (leaders.length > 0) {
           state.coldPlayers = leaders.map(l => ({
             name: l.person.fullName,
-            team: l.team ? l.team.abbreviation : '',
+            team: getTeamAbbrev(l),
             stat: l.value,
             label: 'AVG'
           }));
@@ -976,26 +998,66 @@ const PITCHER_POSITIONS = new Set(['P','SP','RP','CP','CL']);
 async function loadFullPlayerDB() {
   try {
     const season = new Date().getFullYear();
-    const resp = await fetch(`${MLB_API}/sports/1/players?season=${season}`);
+    if (!Object.keys(TEAM_ABBREVS).length) await loadTeamAbbrevs();
+    const resp = await fetch(`${MLB_API}/sports/1/players?season=${season}&hydrate=currentTeam`);
     if (!resp.ok) throw new Error('Player API error');
     const data = await resp.json();
     if (data.people && data.people.length > 0) {
       PLAYER_DB = data.people.map(p => {
         const pos = p.primaryPosition ? p.primaryPosition.abbreviation : '';
         const isPitcher = PITCHER_POSITIONS.has(pos);
-        const teamAbbr = p.currentTeam ? (p.currentTeam.abbreviation || p.currentTeam.name.substring(0,3).toUpperCase()) : '';
+        let teamAbbr = '';
+        if (p.currentTeam) {
+          teamAbbr = p.currentTeam.abbreviation || TEAM_ABBREVS[p.currentTeam.id] || TEAM_ABBREVS[p.currentTeam.name] || '';
+        }
         return {
           id: p.id,
           name: p.fullName,
           team: teamAbbr,
           pos: pos,
-          type: isPitcher ? 'pitcher' : 'hitter'
+          type: isPitcher ? 'pitcher' : 'hitter',
+          number: p.primaryNumber || ''
         };
       }).sort((a, b) => a.name.localeCompare(b.name));
       playerDBLoaded = true;
+      console.log(`Loaded ${PLAYER_DB.length} players from MLB API`);
     }
   } catch(e) {
-    console.log('Full player DB fetch failed, using fallback:', e);
+    console.log('Full player DB fetch failed, trying roster fallback:', e);
+    try {
+      if (!Object.keys(TEAM_ABBREVS).length) await loadTeamAbbrevs();
+      const resp = await fetch(`${MLB_API}/teams?sportId=1&hydrate=roster(person(stats(type=[season])))`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const players = [];
+        if (data.teams) {
+          data.teams.forEach(team => {
+            const abbr = team.abbreviation || '';
+            if (team.roster && team.roster.roster) {
+              team.roster.roster.forEach(r => {
+                const pos = r.position ? r.position.abbreviation : '';
+                const isPitcher = PITCHER_POSITIONS.has(pos);
+                players.push({
+                  id: r.person.id,
+                  name: r.person.fullName,
+                  team: abbr,
+                  pos: pos,
+                  type: isPitcher ? 'pitcher' : 'hitter',
+                  number: r.jerseyNumber || ''
+                });
+              });
+            }
+          });
+        }
+        if (players.length > 0) {
+          PLAYER_DB = players.sort((a, b) => a.name.localeCompare(b.name));
+          playerDBLoaded = true;
+          console.log(`Loaded ${PLAYER_DB.length} players from roster fallback`);
+        }
+      }
+    } catch(e2) {
+      console.log('Roster fallback also failed:', e2);
+    }
     if (!PLAYER_DB.length) {
       PLAYER_DB = [
         { id: 660271, name: 'Shohei Ohtani', team: 'LAD', pos: 'DH', type: 'hitter' },
@@ -1523,7 +1585,7 @@ setInterval(async () => {
     state.games = apiGames;
     await fetchHotCold();
     renderSidebar(state.games);
-    renderMain();
+    if (!editingCall && !editingStat) renderMain();
   }
 }, 15000);
 
@@ -1535,6 +1597,7 @@ async function init() {
   state.coldPlayers = mock.coldPlayers;
   state.standings = mock.standings;
 
+  await loadTeamAbbrevs();
   loadFullPlayerDB();
 
   const apiGames = await tryAPI();
