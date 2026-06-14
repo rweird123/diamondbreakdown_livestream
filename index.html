@@ -863,7 +863,9 @@ function parseAPIGames(apiGames) {
       outs: ls.outs || 0,
       runners: { first: !!(ls.offense && ls.offense.first), second: !!(ls.offense && ls.offense.second), third: !!(ls.offense && ls.offense.third) },
       awayPitcher: awayPP ? awayPP.lastFirstName || awayPP.fullName || '' : '',
-      homePitcher: homePP ? homePP.lastFirstName || homePP.fullName || '' : ''
+      homePitcher: homePP ? homePP.lastFirstName || homePP.fullName || '' : '',
+      awayPitcherEra: awayPP && awayPP.stats ? (awayPP.stats.find(s => s.type && s.type.displayName === 'statsSingleSeason') || {}).era || '' : '',
+      homePitcherEra: homePP && homePP.stats ? (homePP.stats.find(s => s.type && s.type.displayName === 'statsSingleSeason') || {}).era || '' : ''
     };
   });
 }
@@ -895,39 +897,42 @@ async function fetchHotCold() {
   if (!useAPI) return;
   try {
     const season = new Date().getFullYear();
-    const [hotResp, coldResp] = await Promise.all([
+    const [opsResp, avgResp, hrResp] = await Promise.all([
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=onBasePlusSlugging&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team,person(stats(type=season))`),
       fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team`),
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&order=asc&hydrate=team`)
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=homeRuns&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team`)
     ]);
-    if (hotResp.ok) {
-      const hotData = await hotResp.json();
-      if (hotData.leagueLeaders && hotData.leagueLeaders[0] && hotData.leagueLeaders[0].leaders) {
-        const leaders = hotData.leagueLeaders[0].leaders.slice(0, 5);
-        if (leaders.length > 0) {
-          state.hotPlayers = leaders.map(l => ({
-            name: l.person.fullName,
-            team: getTeamAbbrev(l),
-            stat: l.value,
-            label: 'AVG'
-          }));
-        }
+    const hotMap = {};
+    if (opsResp.ok) {
+      const d = await opsResp.json();
+      if (d.leagueLeaders && d.leagueLeaders[0]) {
+        d.leagueLeaders[0].leaders.slice(0, 10).forEach(l => {
+          hotMap[l.person.id] = { name: l.person.fullName, team: getTeamAbbrev(l), ops: l.value, avg: '-', hr: '-' };
+        });
       }
     }
-    if (coldResp.ok) {
-      const coldData = await coldResp.json();
-      if (coldData.leagueLeaders && coldData.leagueLeaders[0] && coldData.leagueLeaders[0].leaders) {
-        const leaders = coldData.leagueLeaders[0].leaders.slice(0, 5);
-        if (leaders.length > 0) {
-          state.coldPlayers = leaders.map(l => ({
-            name: l.person.fullName,
-            team: getTeamAbbrev(l),
-            stat: l.value,
-            label: 'AVG'
-          }));
-        }
+    if (avgResp.ok) {
+      const d = await avgResp.json();
+      if (d.leagueLeaders && d.leagueLeaders[0]) {
+        d.leagueLeaders[0].leaders.forEach(l => {
+          if (hotMap[l.person.id]) hotMap[l.person.id].avg = l.value;
+        });
       }
     }
-  } catch(e) {}
+    if (hrResp.ok) {
+      const d = await hrResp.json();
+      if (d.leagueLeaders && d.leagueLeaders[0]) {
+        d.leagueLeaders[0].leaders.forEach(l => {
+          if (hotMap[l.person.id]) hotMap[l.person.id].hr = l.value;
+        });
+      }
+    }
+    const sorted = Object.values(hotMap).sort((a, b) => parseFloat(b.ops) - parseFloat(a.ops));
+    if (sorted.length >= 5) {
+      state.hotPlayers = sorted.slice(0, 5).map(p => ({ name: p.name, team: p.team, ops: p.ops, avg: p.avg, hr: p.hr }));
+      state.coldPlayers = sorted.slice(-5).reverse().map(p => ({ name: p.name, team: p.team, ops: p.ops, avg: p.avg, hr: p.hr }));
+    }
+  } catch(e) { console.log('Hot/cold fetch failed:', e); }
 }
 
 // -- Latest Homers --
@@ -946,13 +951,16 @@ async function fetchLatestHomers() {
       const game = gamesToFetch[i];
       feed.allPlays.forEach(play => {
         if (play.result && play.result.event === 'Home Run' && play.matchup && play.matchup.batter) {
-          const dist = play.hitData && play.hitData.totalDistance ? play.hitData.totalDistance : null;
-          const launchSpeed = play.hitData && play.hitData.launchSpeed ? play.hitData.launchSpeed : null;
+          let dist = null, ev = null;
+          if (play.hitData) { dist = play.hitData.totalDistance; ev = play.hitData.launchSpeed; }
+          if (!dist && play.playEvents) {
+            const hitEvt = play.playEvents.find(e => e.hitData);
+            if (hitEvt && hitEvt.hitData) { dist = hitEvt.hitData.totalDistance; ev = hitEvt.hitData.launchSpeed; }
+          }
           allHRs.push({
             batter: play.matchup.batter.fullName,
-            team: play.matchup.batter.id ? '' : '',
-            distance: dist,
-            exitVelo: launchSpeed,
+            distance: dist || null,
+            exitVelo: ev || null,
             inning: play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '',
             desc: play.result.description || '',
             matchup: `${game.away.abbr} @ ${game.home.abbr}`,
@@ -966,24 +974,64 @@ async function fetchLatestHomers() {
   } catch(e) { console.log('Homer fetch failed:', e); }
 }
 
+// -- Standings --
+async function fetchStandings() {
+  if (!useAPI) return;
+  try {
+    const season = new Date().getFullYear();
+    const resp = await fetch(`${MLB_API}/standings?leagueId=103,104&season=${season}&standingsTypes=wildCard&hydrate=team`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.records) return;
+    const wcTeams = [];
+    data.records.forEach(rec => {
+      const league = rec.league ? rec.league.abbreviation : '';
+      rec.teamRecords.forEach(tr => {
+        const abbr = tr.team ? (tr.team.abbreviation || TEAM_ABBREVS[tr.team.id] || '') : '';
+        wcTeams.push({
+          team: abbr,
+          league,
+          w: tr.wins,
+          l: tr.losses,
+          wcRank: tr.wildCardRank ? parseInt(tr.wildCardRank) : 99,
+          wcGb: tr.wildCardGamesBack || '-',
+          divRank: tr.divisionRank ? parseInt(tr.divisionRank) : 99,
+          pct: tr.winningPercentage || '.000'
+        });
+      });
+    });
+    const al = wcTeams.filter(t => t.league === 'AL').sort((a,b) => a.wcRank - b.wcRank).slice(0, 6);
+    const nl = wcTeams.filter(t => t.league === 'NL').sort((a,b) => a.wcRank - b.wcRank).slice(0, 6);
+    if (al.length || nl.length) {
+      state.standings = [];
+      al.forEach((t, i) => state.standings.push({ rank: i+1, team: t.team, gb: t.wcGb === '-' ? '—' : t.wcGb }));
+      state.standings.push({ rank: '', team: '|', gb: '' });
+      nl.forEach((t, i) => state.standings.push({ rank: i+1, team: t.team, gb: t.wcGb === '-' ? '—' : t.wcGb }));
+      state.alStandings = al;
+      state.nlStandings = nl;
+      renderStandings();
+    }
+  } catch(e) { console.log('Standings fetch failed:', e); }
+}
+
 // -- Mock Data --
 function getMockGames() {
   return [
-    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G' },
-    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false }, awayPitcher: 'Glasnow, T', homePitcher: 'Webb, L' },
-    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false }, awayPitcher: 'Strider, S', homePitcher: 'Severino, L' },
-    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Verlander, J', homePitcher: 'Scherzer, M' },
-    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Wheeler, Z', homePitcher: 'Cabrera, E' },
-    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true }, awayPitcher: 'Cease, D', homePitcher: 'Gallen, Z' },
-    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Bibee, T', homePitcher: 'Skubal, T' },
-    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Burnes, C', homePitcher: 'Pepiot, R' },
-    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Paddack, C', homePitcher: 'Crochet, G' },
-    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Peralta, F', homePitcher: 'Hendricks, K' },
-    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gilbert, L', homePitcher: 'Detmers, R' },
-    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Skenes, P', homePitcher: 'Greene, H' },
-    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true }, awayPitcher: 'Mikolas, M', homePitcher: 'Singer, B' },
-    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Berrios, J', homePitcher: 'Gray, J' },
-    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gomber, A', homePitcher: 'Waldichuk, K' },
+    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G', awayPitcherEra: '2.95', homePitcherEra: '3.82' },
+    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false }, awayPitcher: 'Glasnow, T', homePitcher: 'Webb, L', awayPitcherEra: '3.12', homePitcherEra: '3.45' },
+    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false }, awayPitcher: 'Strider, S', homePitcher: 'Severino, L', awayPitcherEra: '2.78', homePitcherEra: '3.65' },
+    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Verlander, J', homePitcher: 'Scherzer, M', awayPitcherEra: '3.28', homePitcherEra: '3.92' },
+    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Wheeler, Z', homePitcher: 'Cabrera, E', awayPitcherEra: '2.45', homePitcherEra: '4.88' },
+    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true }, awayPitcher: 'Cease, D', homePitcher: 'Gallen, Z', awayPitcherEra: '3.55', homePitcherEra: '3.18' },
+    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Bibee, T', homePitcher: 'Skubal, T', awayPitcherEra: '3.42', homePitcherEra: '2.15' },
+    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Burnes, C', homePitcher: 'Pepiot, R', awayPitcherEra: '2.88', homePitcherEra: '4.12' },
+    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Paddack, C', homePitcher: 'Crochet, G', awayPitcherEra: '4.15', homePitcherEra: '3.72' },
+    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Peralta, F', homePitcher: 'Hendricks, K', awayPitcherEra: '3.35', homePitcherEra: '4.22' },
+    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gilbert, L', homePitcher: 'Detmers, R', awayPitcherEra: '2.98', homePitcherEra: '4.55' },
+    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Skenes, P', homePitcher: 'Greene, H', awayPitcherEra: '1.89', homePitcherEra: '3.48' },
+    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true }, awayPitcher: 'Mikolas, M', homePitcher: 'Singer, B', awayPitcherEra: '4.65', homePitcherEra: '3.22' },
+    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Berrios, J', homePitcher: 'Gray, J', awayPitcherEra: '3.78', homePitcherEra: '3.95' },
+    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gomber, A', homePitcher: 'Waldichuk, K', awayPitcherEra: '5.12', homePitcherEra: '5.45' },
   ];
 }
 
@@ -1002,18 +1050,18 @@ function getMockPlayerData() {
       tonight: { ab: 3, h: 2, hr: 1, rbi: 3, bb: 1, k: 0 }
     },
     hotPlayers: [
-      { name: 'Aaron Judge', team: 'NYY', stat: '.458', label: 'AVG L7' },
-      { name: 'Bobby Witt Jr.', team: 'KC', stat: '5 HR', label: 'L7' },
-      { name: 'Elly De La Cruz', team: 'CIN', stat: '6 SB', label: 'L7' },
-      { name: 'Gunnar Henderson', team: 'BAL', stat: '1.312', label: 'OPS L7' },
-      { name: 'Mookie Betts', team: 'LAD', stat: '.421', label: 'AVG L7' },
+      { name: 'Aaron Judge', team: 'NYY', ops: '1.145', avg: '.345', hr: '28' },
+      { name: 'Shohei Ohtani', team: 'LAD', ops: '1.048', avg: '.312', hr: '26' },
+      { name: 'Bobby Witt Jr.', team: 'KC', ops: '.982', avg: '.328', hr: '18' },
+      { name: 'Gunnar Henderson', team: 'BAL', ops: '.965', avg: '.298', hr: '22' },
+      { name: 'Mookie Betts', team: 'LAD', ops: '.948', avg: '.305', hr: '17' },
     ],
     coldPlayers: [
-      { name: 'Manny Machado', team: 'SD', stat: '.103', label: 'AVG L7' },
-      { name: 'Bryce Harper', team: 'PHI', stat: '.156', label: 'AVG L7' },
-      { name: 'Pete Alonso', team: 'NYM', stat: '12 K', label: 'L7' },
-      { name: 'Marcus Semien', team: 'TEX', stat: '.125', label: 'AVG L7' },
-      { name: 'Alex Bregman', team: 'HOU', stat: '.148', label: 'AVG L7' },
+      { name: 'Manny Machado', team: 'SD', ops: '.648', avg: '.238', hr: '8' },
+      { name: 'Marcus Semien', team: 'TEX', ops: '.665', avg: '.241', hr: '9' },
+      { name: 'Alex Bregman', team: 'HOU', ops: '.672', avg: '.245', hr: '7' },
+      { name: 'Bryce Harper', team: 'PHI', ops: '.690', avg: '.252', hr: '10' },
+      { name: 'Pete Alonso', team: 'NYM', ops: '.705', avg: '.228', hr: '14' },
     ],
     standings: [
       { rank: 1, team: 'BAL', gb: '+3.0' }, { rank: 2, team: 'NYY', gb: '+1.5' },
@@ -1171,7 +1219,11 @@ function renderSidebar(games) {
     const awayWin = g.statusClass === 'final' && g.away.score > g.home.score;
     const homeWin = g.statusClass === 'final' && g.home.score > g.away.score;
     const isLive = g.statusClass === 'live';
-    const pitcherLine = (g.awayPitcher || g.homePitcher) ? `${shortenPitcher(g.awayPitcher)} vs ${shortenPitcher(g.homePitcher)}` : '';
+    const awayP = shortenPitcher(g.awayPitcher);
+    const homeP = shortenPitcher(g.homePitcher);
+    const awayEra = g.awayPitcherEra ? ` (${g.awayPitcherEra})` : '';
+    const homeEra = g.homePitcherEra ? ` (${g.homePitcherEra})` : '';
+    const pitcherLine = (awayP || homeP) ? `${awayP}${awayEra} vs ${homeP}${homeEra}` : '';
 
     html += `<div class="game-card ${isActive ? 'active' : ''}" onclick="setSpotlight(${g.gamePk})">
       <div class="game-status ${g.statusClass}">
@@ -1315,23 +1367,39 @@ function renderMain() {
 
   const hotColdHtml = `<div class="card hotcold-card">
     <div class="card-header">
-      <span class="card-label">Who's Hot & Cold</span>
-      <span class="card-badge green">Last 7 Days</span>
+      <span class="card-label">OPS Leaders</span>
+      <span class="card-badge green">Season</span>
     </div>
     <div class="card-body">
       <div class="hotcold-grid">
         <div>
-          <div class="hotcold-section-title hot">&#x1F525; On Fire</div>
-          ${state.hotPlayers.map(p => `<div class="hotcold-player hot-row">
-            <div><span class="hotcold-player-name">${p.name}</span><span class="hotcold-player-team">${p.team}</span></div>
-            <div><span class="hotcold-stat hot">${p.stat}</span><span class="hotcold-stat-label">${p.label}</span></div>
+          <div class="hotcold-section-title hot">&#x1F525; Top 5</div>
+          ${state.hotPlayers.map((p, i) => `<div class="hotcold-player hot-row">
+            <div style="display:flex;align-items:center;gap:6px;min-width:0">
+              <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
+              <span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+              <span class="hotcold-player-team">${p.team}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span style="font-size:11px;color:var(--white-muted)">${p.avg} AVG</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.hr} HR</span>
+              <span class="hotcold-stat hot">${p.ops}</span>
+            </div>
           </div>`).join('')}
         </div>
         <div>
-          <div class="hotcold-section-title cold">&#x1F976; Ice Cold</div>
-          ${state.coldPlayers.map(p => `<div class="hotcold-player cold-row">
-            <div><span class="hotcold-player-name">${p.name}</span><span class="hotcold-player-team">${p.team}</span></div>
-            <div><span class="hotcold-stat cold">${p.stat}</span><span class="hotcold-stat-label">${p.label}</span></div>
+          <div class="hotcold-section-title cold">&#x1F976; Bottom 5</div>
+          ${state.coldPlayers.map((p, i) => `<div class="hotcold-player cold-row">
+            <div style="display:flex;align-items:center;gap:6px;min-width:0">
+              <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
+              <span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+              <span class="hotcold-player-team">${p.team}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+              <span style="font-size:11px;color:var(--white-muted)">${p.avg} AVG</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.hr} HR</span>
+              <span class="hotcold-stat cold">${p.ops}</span>
+            </div>
           </div>`).join('')}
         </div>
       </div>
@@ -1534,9 +1602,11 @@ function renderSearchResults(query) {
 
 async function selectPlayer(id, name, team, pos) {
   closePlayerSearch();
+  const numFromDB = PLAYER_DB.find(p => p.id === id);
+  const jersey = (numFromDB && numFromDB.number) ? numFromDB.number : '--';
   if (searchMode === 'pitcher') {
     state.pitcherOfDay = {
-      name, team, position: pos, number: '--',
+      name, team, position: pos, number: jersey,
       season: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
       last7: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
       tonight: null
@@ -1545,7 +1615,7 @@ async function selectPlayer(id, name, team, pos) {
     await fetchPitcherStats(id);
   } else {
     state.hitterOfDay = {
-      name, team, position: pos, number: '--',
+      name, team, position: pos, number: jersey,
       season: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
       last7: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
       tonight: null
@@ -1553,6 +1623,20 @@ async function selectPlayer(id, name, team, pos) {
     renderMain();
     await fetchHitterStats(id);
   }
+  try {
+    const pResp = await fetch(`${MLB_API}/people/${id}`);
+    if (pResp.ok) {
+      const pData = await pResp.json();
+      if (pData.people && pData.people[0]) {
+        const num = pData.people[0].primaryNumber || pData.people[0].jerseyNumber;
+        if (num) {
+          if (searchMode === 'pitcher' && state.pitcherOfDay) state.pitcherOfDay.number = num;
+          else if (state.hitterOfDay) state.hitterOfDay.number = num;
+          renderMain();
+        }
+      }
+    }
+  } catch(e) {}
 }
 
 async function fetchHitterStats(playerId) {
@@ -1613,7 +1697,6 @@ async function fetchPitcherStats(playerId) {
         ip: s.inningsPitched || '-', k: s.strikeOuts ?? '-',
         whip: s.whip || '-', avg: s.avg || '-'
       };
-      state.pitcherOfDay.number = s.jerseyNumber || '--';
       renderMain();
     }
     const glResp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=pitching`);
@@ -1660,7 +1743,7 @@ async function refreshData() {
   btn.textContent = '...';
   const apiGames = await tryAPI();
   if (apiGames) state.games = apiGames;
-  await Promise.all([fetchHotCold(), fetchLatestHomers()]);
+  await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
   renderSidebar(state.games);
   renderMain();
   btn.textContent = 'Refresh';
@@ -1670,7 +1753,7 @@ setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) {
     state.games = apiGames;
-    await Promise.all([fetchHotCold(), fetchLatestHomers()]);
+    await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
     renderSidebar(state.games);
     if (!editingCall && !editingStat) renderMain();
   }
@@ -1690,7 +1773,7 @@ async function init() {
 
   const apiGames = await tryAPI();
   state.games = apiGames || getMockGames();
-  if (useAPI) await Promise.all([fetchHotCold(), fetchLatestHomers()]);
+  if (useAPI) await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
 
   renderSidebar(state.games);
   renderMain();
