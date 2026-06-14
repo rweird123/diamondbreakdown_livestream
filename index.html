@@ -800,7 +800,8 @@ let state = {
   statOfDay: { number: '117.4', unit: 'MPH', desc: "Stanton's hardest hit ball this season — hardest in MLB since Statcast began tracking" },
   hotPlayers: [],
   coldPlayers: [],
-  standings: []
+  standings: [],
+  latestHomers: []
 };
 
 // -- Time --
@@ -929,6 +930,42 @@ async function fetchHotCold() {
   } catch(e) {}
 }
 
+// -- Latest Homers --
+async function fetchLatestHomers() {
+  if (!useAPI) return;
+  try {
+    const activeGames = state.games.filter(g => g.statusClass === 'live' || g.statusClass === 'final');
+    if (!activeGames.length) return;
+    const gamesToFetch = activeGames.slice(0, 10);
+    const feeds = await Promise.all(gamesToFetch.map(g =>
+      fetch(`${MLB_API}/game/${g.gamePk}/playByPlay`).then(r => r.ok ? r.json() : null).catch(() => null)
+    ));
+    const allHRs = [];
+    feeds.forEach((feed, i) => {
+      if (!feed || !feed.allPlays) return;
+      const game = gamesToFetch[i];
+      feed.allPlays.forEach(play => {
+        if (play.result && play.result.event === 'Home Run' && play.matchup && play.matchup.batter) {
+          const dist = play.hitData && play.hitData.totalDistance ? play.hitData.totalDistance : null;
+          const launchSpeed = play.hitData && play.hitData.launchSpeed ? play.hitData.launchSpeed : null;
+          allHRs.push({
+            batter: play.matchup.batter.fullName,
+            team: play.matchup.batter.id ? '' : '',
+            distance: dist,
+            exitVelo: launchSpeed,
+            inning: play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '',
+            desc: play.result.description || '',
+            matchup: `${game.away.abbr} @ ${game.home.abbr}`,
+            startTime: play.about ? play.about.startTime : ''
+          });
+        }
+      });
+    });
+    allHRs.sort((a, b) => (b.startTime || '').localeCompare(a.startTime || ''));
+    state.latestHomers = allHRs.slice(0, 5);
+  } catch(e) { console.log('Homer fetch failed:', e); }
+}
+
 // -- Mock Data --
 function getMockGames() {
   return [
@@ -986,6 +1023,13 @@ function getMockPlayerData() {
       { rank: 1, team: 'LAD', gb: '+5.0' }, { rank: 2, team: 'PHI', gb: '+2.5' },
       { rank: 3, team: 'ATL', gb: '—' }, { rank: 4, team: 'MIL', gb: '-0.5' },
       { rank: 5, team: 'SD', gb: '-2.0' }, { rank: 6, team: 'ARI', gb: '-3.5' },
+    ],
+    latestHomers: [
+      { batter: 'Shohei Ohtani', distance: 438, exitVelo: 112.4, inning: 'B3', matchup: 'LAD @ SF' },
+      { batter: 'Aaron Judge', distance: 421, exitVelo: 110.8, inning: 'T5', matchup: 'NYY @ BOS' },
+      { batter: 'Pete Alonso', distance: 405, exitVelo: 108.2, inning: 'B4', matchup: 'ATL @ NYM' },
+      { batter: 'Bobby Witt Jr.', distance: 412, exitVelo: 109.5, inning: 'B6', matchup: 'STL @ KC' },
+      { batter: 'Yordan Alvarez', distance: 398, exitVelo: 106.1, inning: 'T2', matchup: 'HOU @ TEX' },
     ]
   };
 }
@@ -1346,11 +1390,34 @@ function renderMain() {
     <div class="card-body">${statBodyHtml}</div>
   </div>`;
 
+  const homersHtml = state.latestHomers.length ? `<div class="card hotcold-card">
+    <div class="card-header">
+      <span class="card-label">Latest Homers</span>
+      <span class="card-badge red">${state.latestHomers.length} HR</span>
+    </div>
+    <div class="card-body">
+      ${state.latestHomers.map((hr, i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:rgba(196,36,58,0.08)">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <span style="font-size:18px;width:24px;text-align:center;flex-shrink:0">💣</span>
+          <div style="min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${hr.batter}</div>
+            <div style="font-size:10px;color:var(--white-dim)">${hr.matchup || ''}${hr.inning ? ' · ' + hr.inning : ''}</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:10px">
+          ${hr.distance ? `<div style="font-weight:800;font-size:16px;color:var(--red-light);font-variant-numeric:tabular-nums">${hr.distance} ft</div>` : ''}
+          ${hr.exitVelo ? `<div style="font-size:10px;color:var(--white-dim)">${hr.exitVelo} mph EV</div>` : ''}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>` : '';
+
   main.innerHTML = `<div class="main-grid">
     ${spotlightHtml}
     ${pitcherHtml}
     ${hitterHtml}
     ${hotColdHtml}
+    ${homersHtml}
     ${callHtml}
     ${statHtml}
   </div>`;
@@ -1491,6 +1558,7 @@ async function selectPlayer(id, name, team, pos) {
 async function fetchHitterStats(playerId) {
   try {
     const season = new Date().getFullYear();
+    const todayStr = new Date().toISOString().split('T')[0];
     const resp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=season&season=${season}&group=hitting`);
     const data = await resp.json();
     if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) {
@@ -1504,7 +1572,8 @@ async function fetchHitterStats(playerId) {
     const glResp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=hitting`);
     const glData = await glResp.json();
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
-      const last7 = glData.stats[0].splits.slice(-7);
+      const splits = glData.stats[0].splits;
+      const last7 = splits.slice(-7);
       if (last7.length > 0) {
         let ab=0, h=0, hr=0, rbi=0, bb=0, sb=0, tb=0;
         last7.forEach(g => {
@@ -1517,8 +1586,16 @@ async function fetchHitterStats(playerId) {
           avg: ab > 0 ? (h/ab).toFixed(3) : '-', hr, rbi,
           ops: ab > 0 ? ((h+bb)/(ab+bb) + tb/ab).toFixed(3) : '-', sb, woba: '-'
         };
-        renderMain();
       }
+      const todayGame = splits.find(g => g.date === todayStr);
+      if (todayGame) {
+        const s = todayGame.stat;
+        state.hitterOfDay.tonight = {
+          ab: s.atBats ?? 0, h: s.hits ?? 0, hr: s.homeRuns ?? 0,
+          rbi: s.rbi ?? 0, bb: s.baseOnBalls ?? 0, k: s.strikeOuts ?? 0
+        };
+      }
+      renderMain();
     }
   } catch(e) { console.log('Stats fetch failed:', e); }
 }
@@ -1526,6 +1603,7 @@ async function fetchHitterStats(playerId) {
 async function fetchPitcherStats(playerId) {
   try {
     const season = new Date().getFullYear();
+    const todayStr = new Date().toISOString().split('T')[0];
     const resp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=season&season=${season}&group=pitching`);
     const data = await resp.json();
     if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) {
@@ -1541,7 +1619,8 @@ async function fetchPitcherStats(playerId) {
     const glResp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=pitching`);
     const glData = await glResp.json();
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
-      const last7days = glData.stats[0].splits.slice(-3);
+      const splits = glData.stats[0].splits;
+      const last7days = splits.slice(-3);
       if (last7days.length > 0) {
         let w=0, l=0, ip=0, k=0, bb=0, er=0, hits=0;
         last7days.forEach(g => {
@@ -1554,8 +1633,16 @@ async function fetchPitcherStats(playerId) {
           w, l, era: ip > 0 ? ((er / ip) * 9).toFixed(2) : '-',
           ip: ip.toFixed(1), k, whip: ip > 0 ? ((hits + bb) / ip).toFixed(2) : '-', avg: '-'
         };
-        renderMain();
       }
+      const todayGame = splits.find(g => g.date === todayStr);
+      if (todayGame) {
+        const s = todayGame.stat;
+        state.pitcherOfDay.tonight = {
+          ip: s.inningsPitched || '0', h: s.hits ?? 0, r: s.runs ?? 0,
+          er: s.earnedRuns ?? 0, k: s.strikeOuts ?? 0, bb: s.baseOnBalls ?? 0
+        };
+      }
+      renderMain();
     }
   } catch(e) { console.log('Stats fetch failed:', e); }
 }
@@ -1573,7 +1660,7 @@ async function refreshData() {
   btn.textContent = '...';
   const apiGames = await tryAPI();
   if (apiGames) state.games = apiGames;
-  await fetchHotCold();
+  await Promise.all([fetchHotCold(), fetchLatestHomers()]);
   renderSidebar(state.games);
   renderMain();
   btn.textContent = 'Refresh';
@@ -1583,7 +1670,7 @@ setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) {
     state.games = apiGames;
-    await fetchHotCold();
+    await Promise.all([fetchHotCold(), fetchLatestHomers()]);
     renderSidebar(state.games);
     if (!editingCall && !editingStat) renderMain();
   }
@@ -1596,13 +1683,14 @@ async function init() {
   state.hotPlayers = mock.hotPlayers;
   state.coldPlayers = mock.coldPlayers;
   state.standings = mock.standings;
+  state.latestHomers = mock.latestHomers || [];
 
   await loadTeamAbbrevs();
   loadFullPlayerDB();
 
   const apiGames = await tryAPI();
   state.games = apiGames || getMockGames();
-  if (useAPI) await fetchHotCold();
+  if (useAPI) await Promise.all([fetchHotCold(), fetchLatestHomers()]);
 
   renderSidebar(state.games);
   renderMain();
