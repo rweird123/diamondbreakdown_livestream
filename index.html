@@ -737,6 +737,107 @@ textarea.editable-input { resize: vertical; min-height: 48px; }
   .controls { display: none; }
   .sidebar { page-break-after: always; }
 }
+
+/* ========== STREAM MODE ========== */
+body.stream-mode .controls { display: none; }
+
+/* ========== ERA COLORS ========== */
+.era-elite { color: #22c55e; }
+.era-good { color: #86efac; }
+.era-avg { color: #fbbf24; }
+.era-bad { color: #f87171; }
+
+/* ========== HR FLASH ========== */
+@keyframes hrFlash {
+  0% { background: rgba(196,36,58,0.08); }
+  25% { background: rgba(196,36,58,0.25); }
+  50% { background: rgba(196,36,58,0.08); }
+  75% { background: rgba(196,36,58,0.25); }
+  100% { background: rgba(196,36,58,0.08); }
+}
+.hr-new { animation: hrFlash 1.5s ease; }
+
+/* ========== TICKER ========== */
+.bottom-standings.ticker {
+  animation: ticker 30s linear infinite;
+}
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.bottom-standings.ticker:hover { animation-play-state: paused; }
+
+/* ========== SPOTLIGHT LINE SCORE ========== */
+.linescore-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  margin-top: 12px;
+}
+.linescore-table th, .linescore-table td {
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+  min-width: 22px;
+}
+.linescore-table th {
+  color: var(--white-dim);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.linescore-table td { font-weight: 600; }
+.linescore-table td.team-col {
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 40px;
+}
+.linescore-table td.rhe { font-weight: 800; border-left: 1px solid rgba(255,255,255,0.1); }
+.linescore-table tr.winner td.rhe:first-of-type { color: var(--green-light); }
+
+/* ========== SPOTLIGHT PLAY-BY-PLAY ========== */
+.play-feed {
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.play-feed::-webkit-scrollbar { width: 3px; }
+.play-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.play-item {
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--white-muted);
+  border-left: 2px solid var(--border);
+  margin-bottom: 4px;
+}
+.play-item.scoring {
+  border-left-color: var(--green-light);
+  color: var(--white);
+  font-weight: 600;
+}
+.play-item .play-inning {
+  font-size: 10px;
+  color: var(--white-dim);
+  margin-right: 6px;
+}
+
+/* ========== AUTO-ROTATE INDICATOR ========== */
+.auto-rotate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--green-light);
+  background: rgba(30,122,58,0.15);
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-left: 8px;
+}
 </style>
 </head>
 <body>
@@ -779,12 +880,14 @@ textarea.editable-input { resize: vertical; min-height: 48px; }
   </div>
 </div>
 
-<div class="controls">
+<div class="controls" id="controlPanel">
   <button class="ctrl-btn" onclick="openPlayerSearch('pitcher')">Set Pitcher</button>
   <button class="ctrl-btn" onclick="openPlayerSearch('hitter')">Set Hitter</button>
   <button class="ctrl-btn" onclick="editTheCall()">Edit Call</button>
   <button class="ctrl-btn" onclick="editStatOfDay()">Edit Stat</button>
+  <button class="ctrl-btn" id="autoRotateBtn" onclick="toggleAutoRotate()">Auto-Rotate</button>
   <button class="ctrl-btn" id="refreshBtn" onclick="refreshData()">Refresh</button>
+  <button class="ctrl-btn" id="streamModeBtn" onclick="toggleStreamMode()" style="border-color:var(--hot-color);color:var(--hot-color)">Stream Mode</button>
 </div>
 
 <script>
@@ -864,8 +967,10 @@ function parseAPIGames(apiGames) {
       runners: { first: !!(ls.offense && ls.offense.first), second: !!(ls.offense && ls.offense.second), third: !!(ls.offense && ls.offense.third) },
       awayPitcher: awayPP ? awayPP.lastFirstName || awayPP.fullName || '' : '',
       homePitcher: homePP ? homePP.lastFirstName || homePP.fullName || '' : '',
-      awayPitcherEra: awayPP && awayPP.stats ? (awayPP.stats.find(s => s.type && s.type.displayName === 'statsSingleSeason') || {}).era || '' : '',
-      homePitcherEra: homePP && homePP.stats ? (homePP.stats.find(s => s.type && s.type.displayName === 'statsSingleSeason') || {}).era || '' : ''
+      awayPitcherId: awayPP ? awayPP.id : null,
+      homePitcherId: homePP ? homePP.id : null,
+      awayPitcherEra: '',
+      homePitcherEra: ''
     };
   });
 }
@@ -890,6 +995,37 @@ function getTeamAbbrev(leader) {
     if (leader.team.teamName) return leader.team.teamName.substring(0,3).toUpperCase();
   }
   return '';
+}
+
+// -- Fetch pitcher ERAs for sidebar --
+async function fetchPitcherEras() {
+  if (!useAPI || !state.games.length) return;
+  const pitcherIds = new Set();
+  const idToGames = {};
+  state.games.forEach(g => {
+    if (g.awayPitcherId) { pitcherIds.add(g.awayPitcherId); idToGames[g.awayPitcherId] = idToGames[g.awayPitcherId] || []; idToGames[g.awayPitcherId].push({ game: g, side: 'away' }); }
+    if (g.homePitcherId) { pitcherIds.add(g.homePitcherId); idToGames[g.homePitcherId] = idToGames[g.homePitcherId] || []; idToGames[g.homePitcherId].push({ game: g, side: 'home' }); }
+  });
+  if (!pitcherIds.size) return;
+  const ids = [...pitcherIds];
+  const season = new Date().getFullYear();
+  await Promise.all(ids.map(async id => {
+    try {
+      const r = await fetch(`${MLB_API}/people/${id}/stats?stats=season&season=${season}&group=pitching`);
+      if (!r.ok) return;
+      const d = await r.json();
+      if (d.stats && d.stats[0] && d.stats[0].splits && d.stats[0].splits[0]) {
+        const era = d.stats[0].splits[0].stat.era;
+        if (era && idToGames[id]) {
+          idToGames[id].forEach(({ game, side }) => {
+            if (side === 'away') game.awayPitcherEra = era;
+            else game.homePitcherEra = era;
+          });
+        }
+      }
+    } catch(e) {}
+  }));
+  renderSidebar(state.games);
 }
 
 // -- Hot/Cold: L7 OPS from game logs --
@@ -1057,13 +1193,13 @@ function getMockGames() {
 function getMockPlayerData() {
   return {
     pitcherOfDay: {
-      name: 'Paul Skenes', team: 'PIT', position: 'SP', number: '30',
+      name: 'Paul Skenes', team: 'PIT', position: 'SP', number: '30', playerId: 694973,
       season: { w: 10, l: 2, era: '1.89', ip: '104.2', k: 142, whip: '0.87', avg: '.178' },
       last7: { w: 2, l: 0, era: '0.64', ip: '14.0', k: 21, whip: '0.71', avg: '.122' },
       tonight: { ip: '5.2', h: 2, r: 1, er: 1, k: 9, bb: 1, pitches: 87 }
     },
     hitterOfDay: {
-      name: 'Shohei Ohtani', team: 'LAD', position: 'DH', number: '17',
+      name: 'Shohei Ohtani', team: 'LAD', position: 'DH', number: '17', playerId: 660271,
       season: { avg: '.312', hr: 26, rbi: 62, ops: '1.048', sb: 18, woba: '.421' },
       last7: { avg: '.435', hr: 4, rbi: 9, ops: '1.456', sb: 2, woba: '.518' },
       tonight: { ab: 3, h: 2, hr: 1, rbi: 3, bb: 1, k: 0 }
@@ -1191,6 +1327,127 @@ async function loadFullPlayerDB() {
 
 // -- Render Functions --
 
+function headshot(playerId) {
+  if (!playerId) return '';
+  return `<img src="https://img.mlb.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current" alt="" onerror="this.style.display='none';this.parentNode.textContent=this.parentNode.dataset.fallback||''">`;
+}
+
+function eraClass(era) {
+  const e = parseFloat(era);
+  if (isNaN(e)) return '';
+  if (e <= 2.50) return 'era-elite';
+  if (e <= 3.50) return 'era-good';
+  if (e <= 4.50) return 'era-avg';
+  return 'era-bad';
+}
+
+// -- Stream Mode --
+let streamMode = false;
+function toggleStreamMode() {
+  streamMode = !streamMode;
+  document.body.classList.toggle('stream-mode', streamMode);
+  const btn = document.getElementById('streamModeBtn');
+  if (streamMode) {
+    btn.textContent = 'Exit Stream';
+    setTimeout(() => { document.getElementById('controlPanel').style.display = 'none'; }, 100);
+    document.addEventListener('keydown', streamModeEsc);
+  } else {
+    document.getElementById('controlPanel').style.display = '';
+    btn.textContent = 'Stream Mode';
+    document.removeEventListener('keydown', streamModeEsc);
+  }
+}
+function streamModeEsc(e) { if (e.key === 'Escape') { toggleStreamMode(); } }
+
+// -- Auto-Rotate Spotlight --
+let autoRotateInterval = null;
+let autoRotateIdx = 0;
+function toggleAutoRotate() {
+  const btn = document.getElementById('autoRotateBtn');
+  if (autoRotateInterval) {
+    clearInterval(autoRotateInterval);
+    autoRotateInterval = null;
+    btn.classList.remove('active');
+    btn.textContent = 'Auto-Rotate';
+  } else {
+    btn.classList.add('active');
+    btn.textContent = 'Stop Rotate';
+    rotateSpotlight();
+    autoRotateInterval = setInterval(rotateSpotlight, 8000);
+  }
+}
+function rotateSpotlight() {
+  const liveGames = state.games.filter(g => g.statusClass === 'live');
+  if (!liveGames.length) return;
+  autoRotateIdx = autoRotateIdx % liveGames.length;
+  spotlightGamePk = liveGames[autoRotateIdx].gamePk;
+  autoRotateIdx++;
+  renderSidebar(state.games);
+  renderMain();
+}
+
+// -- localStorage save/load --
+const SAVE_KEY = 'diamond_breakdown_state';
+function saveState() {
+  try {
+    const toSave = {
+      pitcherOfDay: state.pitcherOfDay,
+      hitterOfDay: state.hitterOfDay,
+      theCall: state.theCall,
+      statOfDay: state.statOfDay,
+      hotPlayers: state.hotPlayers,
+      coldPlayers: state.coldPlayers
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
+  } catch(e) {}
+}
+function loadSavedState() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    if (saved.pitcherOfDay) state.pitcherOfDay = saved.pitcherOfDay;
+    if (saved.hitterOfDay) state.hitterOfDay = saved.hitterOfDay;
+    if (saved.theCall) state.theCall = saved.theCall;
+    if (saved.statOfDay) state.statOfDay = saved.statOfDay;
+    if (saved.hotPlayers && saved.hotPlayers.length) state.hotPlayers = saved.hotPlayers;
+    if (saved.coldPlayers && saved.coldPlayers.length) state.coldPlayers = saved.coldPlayers;
+    return true;
+  } catch(e) { return false; }
+}
+
+// -- HR Alert Detection --
+let previousHRKeys = new Set();
+function detectNewHomers() {
+  const currentKeys = new Set(state.latestHomers.map(hr => hr.batter + hr.startTime));
+  const hasNew = [...currentKeys].some(k => !previousHRKeys.has(k)) && previousHRKeys.size > 0;
+  previousHRKeys = currentKeys;
+  return hasNew;
+}
+
+// -- Spotlight Line Score Fetch --
+let spotlightLineScore = null;
+let spotlightPlays = [];
+async function fetchSpotlightData(gamePk) {
+  if (!useAPI || !gamePk) { spotlightLineScore = null; spotlightPlays = []; return; }
+  try {
+    const r = await fetch(`${MLB_API}/game/${gamePk}/linescore`);
+    if (r.ok) {
+      const d = await r.json();
+      spotlightLineScore = d;
+    }
+  } catch(e) { spotlightLineScore = null; }
+  try {
+    const r = await fetch(`${MLB_API}/game/${gamePk}/playByPlay`);
+    if (r.ok) {
+      const d = await r.json();
+      if (d.allPlays) {
+        spotlightPlays = d.allPlays.filter(p => p.result && p.result.description).slice(-8).reverse();
+      }
+    }
+  } catch(e) { spotlightPlays = []; }
+}
+
 function renderRunners(runners, size) {
   const s = size || 28;
   const ds = Math.round(s * 0.24);
@@ -1240,8 +1497,8 @@ function renderSidebar(games) {
     const isLive = g.statusClass === 'live';
     const awayP = shortenPitcher(g.awayPitcher);
     const homeP = shortenPitcher(g.homePitcher);
-    const awayEra = g.awayPitcherEra ? ` (${g.awayPitcherEra})` : '';
-    const homeEra = g.homePitcherEra ? ` (${g.homePitcherEra})` : '';
+    const awayEra = g.awayPitcherEra ? `<span class="${eraClass(g.awayPitcherEra)}" style="font-size:10px;font-weight:700"> ${g.awayPitcherEra}</span>` : '';
+    const homeEra = g.homePitcherEra ? `<span class="${eraClass(g.homePitcherEra)}" style="font-size:10px;font-weight:700"> ${g.homePitcherEra}</span>` : '';
     const pitcherLine = (awayP || homeP) ? `${awayP}${awayEra} vs ${homeP}${homeEra}` : '';
 
     html += `<div class="game-card ${isActive ? 'active' : ''}" onclick="setSpotlight(${g.gamePk})">
@@ -1284,9 +1541,29 @@ function renderMain() {
   if (spotlightGamePk) {
     const g = state.games.find(gm => gm.gamePk === spotlightGamePk);
     if (g) {
+      let lineScoreHtml = '';
+      if (spotlightLineScore && spotlightLineScore.innings && spotlightLineScore.innings.length) {
+        const innings = spotlightLineScore.innings;
+        const maxInn = innings.length;
+        lineScoreHtml = `<table class="linescore-table">
+          <thead><tr><th></th>${innings.map(inn => `<th>${inn.num}</th>`).join('')}<th style="border-left:1px solid rgba(255,255,255,0.1)">R</th><th>H</th><th>E</th></tr></thead>
+          <tbody>
+            <tr><td class="team-col">${g.away.abbr}</td>${innings.map(inn => `<td>${inn.away && inn.away.runs != null ? inn.away.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.runs : g.away.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.errors : '-'}</td></tr>
+            <tr><td class="team-col">${g.home.abbr}</td>${innings.map(inn => `<td>${inn.home && inn.home.runs != null ? inn.home.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.runs : g.home.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.errors : '-'}</td></tr>
+          </tbody>
+        </table>`;
+      }
+      let playsHtml = '';
+      if (spotlightPlays.length) {
+        playsHtml = `<div class="play-feed">${spotlightPlays.map(play => {
+          const isScoring = play.result.event === 'Home Run' || (play.result.rbi && play.result.rbi > 0);
+          const inn = play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '';
+          return `<div class="play-item ${isScoring ? 'scoring' : ''}"><span class="play-inning">${inn}</span>${play.result.description}</div>`;
+        }).join('')}</div>`;
+      }
       spotlightHtml = `<div class="card spotlight-card">
         <div class="card-header">
-          <span class="card-label">Game Spotlight</span>
+          <span class="card-label">Game Spotlight${autoRotateInterval ? '<span class="auto-rotate-badge"><span class="live-dot"></span>Auto</span>' : ''}</span>
           <span class="card-badge green">${g.status}</span>
         </div>
         <div class="card-body">
@@ -1315,6 +1592,8 @@ function renderMain() {
               <div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div>
             </div>
           </div>
+          ${lineScoreHtml}
+          ${playsHtml}
         </div>
       </div>`;
     }
@@ -1327,7 +1606,7 @@ function renderMain() {
     </div>
     <div class="card-body">
       <div class="player-hero">
-        <div class="player-avatar">${p.number}</div>
+        <div class="player-avatar" data-fallback="${p.number}">${p.playerId ? headshot(p.playerId) : p.number}</div>
         <div class="player-info">
           <div class="player-name">${p.name}</div>
           <div class="player-team">${p.team}</div>
@@ -1359,7 +1638,7 @@ function renderMain() {
     </div>
     <div class="card-body">
       <div class="player-hero">
-        <div class="player-avatar">${h.number}</div>
+        <div class="player-avatar" data-fallback="${h.number}">${h.playerId ? headshot(h.playerId) : h.number}</div>
         <div class="player-info">
           <div class="player-name">${h.name}</div>
           <div class="player-team">${h.team}</div>
@@ -1477,7 +1756,8 @@ function renderMain() {
     <div class="card-body">${statBodyHtml}</div>
   </div>`;
 
-  const homersHtml = state.latestHomers.length ? `<div class="card hotcold-card">
+  const newHR = detectNewHomers();
+  const homersHtml = state.latestHomers.length ? `<div class="card hotcold-card${newHR ? ' hr-new' : ''}">
     <div class="card-header">
       <span class="card-label">Latest Homers</span>
       <span class="card-badge red">${state.latestHomers.length} HR</span>
@@ -1512,26 +1792,35 @@ function renderMain() {
 
 function renderStandings() {
   const el = document.getElementById('bottomStandings');
-  el.innerHTML = state.standings.map(s => {
+  const items = state.standings.map(s => {
     if (s.team === '|') return `<span style="color:var(--border);font-size:14px">|</span>`;
     return `<div class="standing-item">
       <span class="standing-rank">${s.rank}.</span>
       <span class="standing-team">${s.team}</span>
-      <span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : 'var(--white-dim)'}">${s.gb}</span>
+      <span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : s.gb === '—' ? 'var(--white-muted)' : 'var(--white-dim)'}">${s.gb}</span>
     </div>`;
   }).join('');
+  el.innerHTML = items + items;
+  el.classList.add('ticker');
 }
 
 // -- Interactions --
 
-function setSpotlight(gamePk) {
+async function setSpotlight(gamePk) {
   spotlightGamePk = spotlightGamePk === gamePk ? null : gamePk;
+  spotlightLineScore = null;
+  spotlightPlays = [];
   renderSidebar(state.games);
   renderMain();
+  if (spotlightGamePk) {
+    await fetchSpotlightData(spotlightGamePk);
+    renderMain();
+  }
 }
 
 function setCallStatus(status) {
   state.theCall.status = status;
+  saveState();
   renderMain();
 }
 
@@ -1552,6 +1841,7 @@ function saveTheCall() {
     state.theCall.status = 'pending';
   }
   editingCall = false;
+  saveState();
   renderMain();
 }
 
@@ -1572,6 +1862,7 @@ function saveStatOfDay() {
   if (unit) state.statOfDay.unit = unit.value || '';
   if (desc) state.statOfDay.desc = desc.value || state.statOfDay.desc;
   editingStat = false;
+  saveState();
   renderMain();
 }
 
@@ -1625,7 +1916,7 @@ async function selectPlayer(id, name, team, pos) {
   const jersey = (numFromDB && numFromDB.number) ? numFromDB.number : '--';
   if (searchMode === 'pitcher') {
     state.pitcherOfDay = {
-      name, team, position: pos, number: jersey,
+      name, team, position: pos, number: jersey, playerId: id,
       season: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
       last7: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
       tonight: null
@@ -1634,7 +1925,7 @@ async function selectPlayer(id, name, team, pos) {
     await fetchPitcherStats(id);
   } else {
     state.hitterOfDay = {
-      name, team, position: pos, number: jersey,
+      name, team, position: pos, number: jersey, playerId: id,
       season: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
       last7: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
       tonight: null
@@ -1651,6 +1942,7 @@ async function selectPlayer(id, name, team, pos) {
         if (num) {
           if (searchMode === 'pitcher' && state.pitcherOfDay) state.pitcherOfDay.number = num;
           else if (state.hitterOfDay) state.hitterOfDay.number = num;
+          saveState();
           renderMain();
         }
       }
@@ -1762,6 +2054,7 @@ async function refreshData() {
   btn.textContent = '...';
   const apiGames = await tryAPI();
   if (apiGames) state.games = apiGames;
+  fetchPitcherEras();
   await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
   renderSidebar(state.games);
   renderMain();
@@ -1772,6 +2065,7 @@ setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) {
     state.games = apiGames;
+    fetchPitcherEras();
     await Promise.all([fetchLatestHomers(), fetchStandings()]);
     renderSidebar(state.games);
     if (!editingCall && !editingStat) renderMain();
@@ -1787,12 +2081,17 @@ async function init() {
   state.standings = mock.standings;
   state.latestHomers = mock.latestHomers || [];
 
+  loadSavedState();
+
   await loadTeamAbbrevs();
   loadFullPlayerDB();
 
   const apiGames = await tryAPI();
   state.games = apiGames || getMockGames();
-  if (useAPI) await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
+  if (useAPI) {
+    fetchPitcherEras();
+    await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
+  }
 
   renderSidebar(state.games);
   renderMain();
