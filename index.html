@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +40,7 @@ body {
 
 .dashboard {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   grid-template-rows: 64px minmax(0, 1fr) 48px;
   height: 100vh;
   width: 100vw;
@@ -58,17 +59,9 @@ body {
   z-index: 10;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+.header-left { display: flex; align-items: center; gap: 16px; }
 
-.header-title {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
+.header-title { display: flex; flex-direction: column; line-height: 1.1; }
 
 .header-title .brand {
   font-size: 15px;
@@ -102,17 +95,9 @@ body {
   50% { opacity: 0.4; }
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
+.header-right { display: flex; align-items: center; gap: 20px; }
 
-.header-date {
-  font-size: 13px;
-  color: var(--white-muted);
-  font-weight: 500;
-}
+.header-date { font-size: 13px; color: var(--white-muted); font-weight: 500; }
 
 .header-clock {
   font-size: 18px;
@@ -132,13 +117,7 @@ body {
   border-radius: 4px;
 }
 
-.api-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--live-green);
-}
-
+.api-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live-green); }
 .api-dot.offline { background: var(--red-primary); }
 
 /* ========== SCOREBOARD SIDEBAR ========== */
@@ -155,7 +134,7 @@ body {
 .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
 .sidebar-header {
-  padding: 14px 16px 10px;
+  padding: 14px 14px 10px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -182,7 +161,7 @@ body {
 }
 
 .game-card {
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.15s;
@@ -193,7 +172,7 @@ body {
 .game-card.active {
   background: var(--bg-card);
   border-left: 3px solid var(--green-primary);
-  padding-left: 13px;
+  padding-left: 11px;
 }
 
 .game-status {
@@ -201,7 +180,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -211,11 +190,7 @@ body {
 .game-status.final { color: var(--white-dim); }
 .game-status.pre { color: var(--hot-color); }
 
-.game-teams {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+.game-teams { display: flex; flex-direction: column; gap: 3px; }
 
 .game-team-row {
   display: flex;
@@ -224,23 +199,11 @@ body {
   font-size: 13px;
 }
 
-.team-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
+.team-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
-.team-abbr {
-  font-weight: 700;
-  width: 32px;
-  font-size: 13px;
-}
+.team-abbr { font-weight: 700; width: 32px; font-size: 13px; }
 
-.team-record {
-  font-size: 10px;
-  color: var(--white-dim);
-}
+.team-record { font-size: 10px; color: var(--white-dim); }
 
 .team-score {
   font-weight: 800;
@@ -251,6 +214,29 @@ body {
 }
 
 .team-score.winner { color: var(--green-light); }
+
+.game-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.game-pitchers {
+  font-size: 10px;
+  color: var(--white-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.game-runners-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
 
 /* ========== MAIN CONTENT ========== */
 .main {
@@ -336,27 +322,12 @@ body {
   overflow: hidden;
 }
 
-.player-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.player-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .player-info { min-width: 0; }
 
-.player-name {
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 2px;
-}
-
-.player-team {
-  font-size: 12px;
-  color: var(--white-dim);
-  font-weight: 500;
-}
-
+.player-name { font-size: 18px; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
+.player-team { font-size: 12px; color: var(--white-dim); font-weight: 500; }
 .player-position {
   font-size: 10px;
   color: var(--green-light);
@@ -365,11 +336,7 @@ body {
   letter-spacing: 1px;
 }
 
-.stat-row {
-  display: grid;
-  gap: 2px;
-  margin-bottom: 10px;
-}
+.stat-row { display: grid; gap: 2px; margin-bottom: 10px; }
 
 .stat-row-header {
   display: grid;
@@ -415,7 +382,7 @@ body {
 
 .stat-highlight { color: var(--green-light); }
 
-/* Input fields for editable content */
+/* Input fields */
 .editable-input {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--border);
@@ -429,18 +396,9 @@ body {
   transition: border-color 0.2s;
 }
 
-.editable-input:focus {
-  border-color: var(--green-primary);
-}
-
-.editable-input::placeholder {
-  color: var(--white-dim);
-}
-
-textarea.editable-input {
-  resize: vertical;
-  min-height: 48px;
-}
+.editable-input:focus { border-color: var(--green-primary); }
+.editable-input::placeholder { color: var(--white-dim); }
+textarea.editable-input { resize: vertical; min-height: 48px; }
 
 /* Hot & Cold */
 .hotcold-card { grid-column: 1 / -1; }
@@ -474,24 +432,11 @@ textarea.editable-input {
   transition: background 0.15s;
 }
 
-.hotcold-player.hot-row {
-  background: var(--hot-bg);
-}
+.hotcold-player.hot-row { background: var(--hot-bg); }
+.hotcold-player.cold-row { background: var(--cold-bg); }
 
-.hotcold-player.cold-row {
-  background: var(--cold-bg);
-}
-
-.hotcold-player-name {
-  font-weight: 700;
-  font-size: 13px;
-}
-
-.hotcold-player-team {
-  color: var(--white-dim);
-  font-size: 11px;
-  margin-left: 6px;
-}
+.hotcold-player-name { font-weight: 700; font-size: 13px; }
+.hotcold-player-team { color: var(--white-dim); font-size: 11px; margin-left: 6px; }
 
 .hotcold-stat {
   font-weight: 800;
@@ -501,12 +446,7 @@ textarea.editable-input {
 
 .hotcold-stat.hot { color: var(--hot-color); }
 .hotcold-stat.cold { color: var(--cold-color); }
-
-.hotcold-stat-label {
-  font-size: 10px;
-  color: var(--white-dim);
-  margin-left: 4px;
-}
+.hotcold-stat-label { font-size: 10px; color: var(--white-dim); margin-left: 4px; }
 
 /* The Call & Stat of the Day */
 .call-card, .stat-card { grid-column: span 1; }
@@ -522,11 +462,7 @@ textarea.editable-input {
   min-height: 60px;
 }
 
-.call-status {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
+.call-status { display: flex; gap: 8px; margin-top: 10px; }
 
 .call-btn {
   padding: 5px 14px;
@@ -547,10 +483,7 @@ textarea.editable-input {
 .call-btn.hit { border-color: var(--green-light); color: var(--green-light); background: rgba(34,197,94,0.1); }
 .call-btn.miss { border-color: var(--red-primary); color: var(--red-light); background: rgba(196,36,58,0.1); }
 
-.stat-featured {
-  text-align: center;
-  padding: 10px 0;
-}
+.stat-featured { text-align: center; padding: 10px 0; }
 
 .stat-big-number {
   font-size: 42px;
@@ -569,9 +502,7 @@ textarea.editable-input {
 }
 
 /* Spotlight / Game Detail */
-.spotlight-card {
-  grid-column: 1 / -1;
-}
+.spotlight-card { grid-column: 1 / -1; }
 
 .spotlight-matchup {
   display: flex;
@@ -581,20 +512,9 @@ textarea.editable-input {
   padding: 10px 0;
 }
 
-.spotlight-team {
-  text-align: center;
-}
-
-.spotlight-team-name {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 2px;
-}
-
-.spotlight-team-record {
-  font-size: 11px;
-  color: var(--white-dim);
-}
+.spotlight-team { text-align: center; }
+.spotlight-team-name { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
+.spotlight-team-record { font-size: 11px; color: var(--white-dim); }
 
 .spotlight-score {
   font-size: 48px;
@@ -603,11 +523,7 @@ textarea.editable-input {
   letter-spacing: 2px;
 }
 
-.spotlight-vs {
-  font-size: 12px;
-  color: var(--white-dim);
-  font-weight: 600;
-}
+.spotlight-vs { font-size: 12px; color: var(--white-dim); font-weight: 600; }
 
 .spotlight-detail {
   display: grid;
@@ -631,9 +547,12 @@ textarea.editable-input {
   margin-bottom: 4px;
 }
 
-.spotlight-detail-value {
-  font-size: 15px;
-  font-weight: 700;
+.spotlight-detail-value { font-size: 15px; font-weight: 700; }
+
+.spotlight-bases-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Player Search Overlay */
@@ -683,10 +602,7 @@ textarea.editable-input {
 
 .player-search-input:focus { border-color: var(--green-primary); }
 
-.player-search-results {
-  max-height: 250px;
-  overflow-y: auto;
-}
+.player-search-results { max-height: 250px; overflow-y: auto; }
 
 .player-search-result {
   padding: 8px 10px;
@@ -700,7 +616,6 @@ textarea.editable-input {
 }
 
 .player-search-result:hover { background: var(--bg-card-hover); }
-
 .player-search-result .name { font-weight: 700; }
 .player-search-result .meta { color: var(--white-dim); font-size: 11px; }
 
@@ -733,16 +648,8 @@ textarea.editable-input {
   font-variant-numeric: tabular-nums;
 }
 
-.standing-rank {
-  font-weight: 800;
-  color: var(--white);
-  font-size: 12px;
-}
-
-.standing-team {
-  font-weight: 600;
-  color: var(--white-muted);
-}
+.standing-rank { font-weight: 800; color: var(--white); font-size: 12px; }
+.standing-team { font-weight: 600; color: var(--white-muted); }
 
 .bottom-label {
   font-weight: 700;
@@ -752,7 +659,7 @@ textarea.editable-input {
   white-space: nowrap;
 }
 
-/* Control Panel (small floating) */
+/* Control Panel */
 .controls {
   position: fixed;
   top: 72px;
@@ -783,11 +690,7 @@ textarea.editable-input {
 .ctrl-btn.active { border-color: var(--green-primary); color: var(--green-light); }
 
 /* Inline Edit Forms */
-.inline-edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.inline-edit-form { display: flex; flex-direction: column; gap: 8px; }
 
 .inline-edit-form input,
 .inline-edit-form textarea {
@@ -802,21 +705,10 @@ textarea.editable-input {
   outline: none;
 }
 
-.inline-edit-form textarea {
-  resize: vertical;
-  min-height: 50px;
-}
+.inline-edit-form textarea { resize: vertical; min-height: 50px; }
+.inline-edit-form input:focus, .inline-edit-form textarea:focus { border-color: var(--green-primary); }
 
-.inline-edit-form input:focus,
-.inline-edit-form textarea:focus {
-  border-color: var(--green-primary);
-}
-
-.inline-edit-actions {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
+.inline-edit-actions { display: flex; gap: 6px; justify-content: flex-end; }
 
 .inline-edit-actions button {
   padding: 5px 14px;
@@ -850,7 +742,6 @@ textarea.editable-input {
 <body>
 
 <div class="dashboard">
-  <!-- HEADER -->
   <header class="header">
     <div class="header-left">
       <div class="header-title">
@@ -868,20 +759,15 @@ textarea.editable-input {
     </div>
   </header>
 
-  <!-- SIDEBAR: ALL GAMES -->
   <aside class="sidebar" id="sidebar"></aside>
-
-  <!-- MAIN CONTENT -->
   <main class="main" id="mainContent"></main>
 
-  <!-- BOTTOM BAR -->
   <footer class="bottom-bar">
     <span class="bottom-label">WC Race</span>
     <div class="bottom-standings" id="bottomStandings"></div>
   </footer>
 </div>
 
-<!-- PLAYER SEARCH OVERLAY -->
 <div class="player-search-overlay" id="playerSearchOverlay">
   <div class="player-search-box">
     <div class="player-search-title" id="searchTitle">Search Player</div>
@@ -893,7 +779,6 @@ textarea.editable-input {
   </div>
 </div>
 
-<!-- CONTROLS (streamer-only, hide in OBS if needed) -->
 <div class="controls">
   <button class="ctrl-btn" onclick="openPlayerSearch('pitcher')">Set Pitcher</button>
   <button class="ctrl-btn" onclick="openPlayerSearch('hitter')">Set Hitter</button>
@@ -903,15 +788,10 @@ textarea.editable-input {
 </div>
 
 <script>
-// =============================================
-// MLB STATS API INTEGRATION + MOCK FALLBACK
-// =============================================
-
 const MLB_API = 'https://statsapi.mlb.com/api/v1';
 let useAPI = false;
 let spotlightGamePk = null;
 
-// -- State --
 let state = {
   games: [],
   pitcherOfDay: null,
@@ -926,8 +806,7 @@ let state = {
 // -- Time --
 function updateClock() {
   const now = new Date();
-  const opts = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   document.getElementById('headerClock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 setInterval(updateClock, 1000);
@@ -937,7 +816,7 @@ updateClock();
 async function tryAPI() {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const resp = await fetch(`${MLB_API}/schedule?date=${today}&sportId=1&hydrate=linescore,team`);
+    const resp = await fetch(`${MLB_API}/schedule?date=${today}&sportId=1&hydrate=linescore,team,probablePitcher`);
     if (!resp.ok) throw new Error('API error');
     const data = await resp.json();
     if (data.dates && data.dates.length > 0) {
@@ -946,9 +825,7 @@ async function tryAPI() {
       document.getElementById('apiLabel').textContent = 'MLB API LIVE';
       return parseAPIGames(data.dates[0].games);
     }
-  } catch(e) {
-    // API unavailable
-  }
+  } catch(e) {}
   useAPI = false;
   document.getElementById('apiDot').classList.add('offline');
   document.getElementById('apiLabel').textContent = 'DEMO MODE';
@@ -974,6 +851,8 @@ function parseAPIGames(apiGames) {
       status = t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       statusClass = 'pre';
     }
+    const awayPP = away.probablePitcher;
+    const homePP = home.probablePitcher;
     return {
       gamePk: g.gamePk,
       away: { abbr: away.team.abbreviation || away.team.teamName.substring(0,3).toUpperCase(), name: away.team.teamName, record: `${away.leagueRecord.wins}-${away.leagueRecord.losses}`, score: away.score ?? 0 },
@@ -981,31 +860,72 @@ function parseAPIGames(apiGames) {
       status, statusClass,
       inning: ls.currentInning || 0,
       outs: ls.outs || 0,
-      runners: { first: !!(ls.offense && ls.offense.first), second: !!(ls.offense && ls.offense.second), third: !!(ls.offense && ls.offense.third) }
+      runners: { first: !!(ls.offense && ls.offense.first), second: !!(ls.offense && ls.offense.second), third: !!(ls.offense && ls.offense.third) },
+      awayPitcher: awayPP ? awayPP.lastFirstName || awayPP.fullName || '' : '',
+      homePitcher: homePP ? homePP.lastFirstName || homePP.fullName || '' : ''
     };
   });
 }
 
+// -- Hot/Cold API fetch --
+async function fetchHotCold() {
+  if (!useAPI) return;
+  try {
+    const season = new Date().getFullYear();
+    const [hotResp, coldResp] = await Promise.all([
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=5&statType=season&gameTypes=R`),
+      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=5&statType=season&gameTypes=R&order=asc`)
+    ]);
+    if (hotResp.ok) {
+      const hotData = await hotResp.json();
+      if (hotData.leagueLeaders && hotData.leagueLeaders[0] && hotData.leagueLeaders[0].leaders) {
+        const leaders = hotData.leagueLeaders[0].leaders.slice(0, 5);
+        if (leaders.length > 0) {
+          state.hotPlayers = leaders.map(l => ({
+            name: l.person.fullName,
+            team: l.team ? l.team.abbreviation : '',
+            stat: l.value,
+            label: 'AVG'
+          }));
+        }
+      }
+    }
+    if (coldResp.ok) {
+      const coldData = await coldResp.json();
+      if (coldData.leagueLeaders && coldData.leagueLeaders[0] && coldData.leagueLeaders[0].leaders) {
+        const leaders = coldData.leagueLeaders[0].leaders.slice(0, 5);
+        if (leaders.length > 0) {
+          state.coldPlayers = leaders.map(l => ({
+            name: l.person.fullName,
+            team: l.team ? l.team.abbreviation : '',
+            stat: l.value,
+            label: 'AVG'
+          }));
+        }
+      }
+    }
+  } catch(e) {}
+}
+
 // -- Mock Data --
 function getMockGames() {
-  const games = [
-    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false } },
-    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false } },
-    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false } },
-    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false } },
-    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false } },
-    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true } },
-    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false } },
-    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false } },
-    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false } },
-    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false } },
-    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false } },
-    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false } },
-    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true } },
-    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false } },
-    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false } },
+  return [
+    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G' },
+    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false }, awayPitcher: 'Glasnow, T', homePitcher: 'Webb, L' },
+    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false }, awayPitcher: 'Strider, S', homePitcher: 'Severino, L' },
+    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Verlander, J', homePitcher: 'Scherzer, M' },
+    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Wheeler, Z', homePitcher: 'Cabrera, E' },
+    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true }, awayPitcher: 'Cease, D', homePitcher: 'Gallen, Z' },
+    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Bibee, T', homePitcher: 'Skubal, T' },
+    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Burnes, C', homePitcher: 'Pepiot, R' },
+    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Paddack, C', homePitcher: 'Crochet, G' },
+    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Peralta, F', homePitcher: 'Hendricks, K' },
+    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gilbert, L', homePitcher: 'Detmers, R' },
+    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Skenes, P', homePitcher: 'Greene, H' },
+    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true }, awayPitcher: 'Mikolas, M', homePitcher: 'Singer, B' },
+    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Berrios, J', homePitcher: 'Gray, J' },
+    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gomber, A', homePitcher: 'Waldichuk, K' },
   ];
-  return games;
 }
 
 function getMockPlayerData() {
@@ -1037,57 +957,98 @@ function getMockPlayerData() {
       { name: 'Alex Bregman', team: 'HOU', stat: '.148', label: 'AVG L7' },
     ],
     standings: [
-      { rank: 1, team: 'BAL', gb: '+3.0' },
-      { rank: 2, team: 'NYY', gb: '+1.5' },
-      { rank: 3, team: 'KC', gb: '—' },
-      { rank: 4, team: 'CLE', gb: '-0.5' },
-      { rank: 5, team: 'MIN', gb: '-2.0' },
-      { rank: 6, team: 'SEA', gb: '-3.0' },
+      { rank: 1, team: 'BAL', gb: '+3.0' }, { rank: 2, team: 'NYY', gb: '+1.5' },
+      { rank: 3, team: 'KC', gb: '—' }, { rank: 4, team: 'CLE', gb: '-0.5' },
+      { rank: 5, team: 'MIN', gb: '-2.0' }, { rank: 6, team: 'SEA', gb: '-3.0' },
       { rank: '', team: '|', gb: '' },
-      { rank: 1, team: 'LAD', gb: '+5.0' },
-      { rank: 2, team: 'PHI', gb: '+2.5' },
-      { rank: 3, team: 'ATL', gb: '—' },
-      { rank: 4, team: 'MIL', gb: '-0.5' },
-      { rank: 5, team: 'SD', gb: '-2.0' },
-      { rank: 6, team: 'ARI', gb: '-3.5' },
+      { rank: 1, team: 'LAD', gb: '+5.0' }, { rank: 2, team: 'PHI', gb: '+2.5' },
+      { rank: 3, team: 'ATL', gb: '—' }, { rank: 4, team: 'MIL', gb: '-0.5' },
+      { rank: 5, team: 'SD', gb: '-2.0' }, { rank: 6, team: 'ARI', gb: '-3.5' },
     ]
   };
 }
 
-// -- Player Database (for search) --
-const PLAYER_DB = [
-  { id: 660271, name: 'Shohei Ohtani', team: 'LAD', pos: 'DH', type: 'hitter' },
-  { id: 592450, name: 'Aaron Judge', team: 'NYY', pos: 'RF', type: 'hitter' },
-  { id: 665489, name: 'Bobby Witt Jr.', team: 'KC', pos: 'SS', type: 'hitter' },
-  { id: 671096, name: 'Elly De La Cruz', team: 'CIN', pos: 'SS', type: 'hitter' },
-  { id: 683002, name: 'Gunnar Henderson', team: 'BAL', pos: 'SS', type: 'hitter' },
-  { id: 605141, name: 'Mookie Betts', team: 'LAD', pos: '2B', type: 'hitter' },
-  { id: 571448, name: 'Freddie Freeman', team: 'LAD', pos: '1B', type: 'hitter' },
-  { id: 665742, name: 'Juan Soto', team: 'NYY', pos: 'RF', type: 'hitter' },
-  { id: 547180, name: 'Bryce Harper', team: 'PHI', pos: '1B', type: 'hitter' },
-  { id: 666969, name: 'Corbin Carroll', team: 'ARI', pos: 'CF', type: 'hitter' },
-  { id: 624413, name: 'Manny Machado', team: 'SD', pos: '3B', type: 'hitter' },
-  { id: 624424, name: 'Pete Alonso', team: 'NYM', pos: '1B', type: 'hitter' },
-  { id: 543685, name: 'Marcus Semien', team: 'TEX', pos: '2B', type: 'hitter' },
-  { id: 608324, name: 'Alex Bregman', team: 'HOU', pos: '3B', type: 'hitter' },
-  { id: 694973, name: 'Paul Skenes', team: 'PIT', pos: 'SP', type: 'pitcher' },
-  { id: 477132, name: 'Zack Wheeler', team: 'PHI', pos: 'SP', type: 'pitcher' },
-  { id: 594798, name: 'Gerrit Cole', team: 'NYY', pos: 'SP', type: 'pitcher' },
-  { id: 669373, name: 'Tarik Skubal', team: 'DET', pos: 'SP', type: 'pitcher' },
-  { id: 605483, name: 'Corbin Burnes', team: 'BAL', pos: 'SP', type: 'pitcher' },
-  { id: 657277, name: 'Logan Webb', team: 'SF', pos: 'SP', type: 'pitcher' },
-  { id: 680686, name: 'Spencer Strider', team: 'ATL', pos: 'SP', type: 'pitcher' },
-  { id: 572020, name: 'Max Scherzer', team: 'TEX', pos: 'SP', type: 'pitcher' },
-  { id: 543037, name: 'Justin Verlander', team: 'HOU', pos: 'SP', type: 'pitcher' },
-  { id: 666142, name: 'Dylan Cease', team: 'SD', pos: 'SP', type: 'pitcher' },
-  { id: 608566, name: 'Tyler Glasnow', team: 'LAD', pos: 'SP', type: 'pitcher' },
-  { id: 656427, name: 'Yoshinobu Yamamoto', team: 'LAD', pos: 'SP', type: 'pitcher' },
-];
+let PLAYER_DB = [];
+let playerDBLoaded = false;
+
+const PITCHER_POSITIONS = new Set(['P','SP','RP','CP','CL']);
+
+async function loadFullPlayerDB() {
+  try {
+    const season = new Date().getFullYear();
+    const resp = await fetch(`${MLB_API}/sports/1/players?season=${season}`);
+    if (!resp.ok) throw new Error('Player API error');
+    const data = await resp.json();
+    if (data.people && data.people.length > 0) {
+      PLAYER_DB = data.people.map(p => {
+        const pos = p.primaryPosition ? p.primaryPosition.abbreviation : '';
+        const isPitcher = PITCHER_POSITIONS.has(pos);
+        const teamAbbr = p.currentTeam ? (p.currentTeam.abbreviation || p.currentTeam.name.substring(0,3).toUpperCase()) : '';
+        return {
+          id: p.id,
+          name: p.fullName,
+          team: teamAbbr,
+          pos: pos,
+          type: isPitcher ? 'pitcher' : 'hitter'
+        };
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      playerDBLoaded = true;
+    }
+  } catch(e) {
+    console.log('Full player DB fetch failed, using fallback:', e);
+    if (!PLAYER_DB.length) {
+      PLAYER_DB = [
+        { id: 660271, name: 'Shohei Ohtani', team: 'LAD', pos: 'DH', type: 'hitter' },
+        { id: 592450, name: 'Aaron Judge', team: 'NYY', pos: 'RF', type: 'hitter' },
+        { id: 665489, name: 'Bobby Witt Jr.', team: 'KC', pos: 'SS', type: 'hitter' },
+        { id: 671096, name: 'Elly De La Cruz', team: 'CIN', pos: 'SS', type: 'hitter' },
+        { id: 683002, name: 'Gunnar Henderson', team: 'BAL', pos: 'SS', type: 'hitter' },
+        { id: 605141, name: 'Mookie Betts', team: 'LAD', pos: '2B', type: 'hitter' },
+        { id: 665742, name: 'Juan Soto', team: 'NYY', pos: 'RF', type: 'hitter' },
+        { id: 547180, name: 'Bryce Harper', team: 'PHI', pos: '1B', type: 'hitter' },
+        { id: 694973, name: 'Paul Skenes', team: 'PIT', pos: 'SP', type: 'pitcher' },
+        { id: 594798, name: 'Gerrit Cole', team: 'NYY', pos: 'SP', type: 'pitcher' },
+        { id: 669373, name: 'Tarik Skubal', team: 'DET', pos: 'SP', type: 'pitcher' },
+        { id: 605483, name: 'Corbin Burnes', team: 'BAL', pos: 'SP', type: 'pitcher' },
+        { id: 608566, name: 'Tyler Glasnow', team: 'LAD', pos: 'SP', type: 'pitcher' },
+      ];
+    }
+  }
+}
 
 // -- Render Functions --
 
+function renderRunners(runners, size) {
+  const s = size || 28;
+  const ds = Math.round(s * 0.24);
+  const spread = Math.round(s * 0.27);
+  const cx = s / 2;
+  const cy = s / 2;
+  const onColor = '#22c55e';
+  const offColor = 'rgba(255,255,255,0.08)';
+  const stroke = 'rgba(255,255,255,0.15)';
+  const bases = [
+    { x: cx, y: cy - spread, on: runners.second },
+    { x: cx + spread, y: cy, on: runners.first },
+    { x: cx - spread, y: cy, on: runners.third },
+  ];
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" style="display:block">
+    ${bases.map(b => `<rect x="${b.x - ds/2}" y="${b.y - ds/2}" width="${ds}" height="${ds}" rx="1"
+      transform="rotate(45 ${b.x} ${b.y})"
+      fill="${b.on ? onColor : offColor}" stroke="${stroke}" stroke-width="0.5"/>`).join('')}
+  </svg>`;
+}
+
+function shortenPitcher(name) {
+  if (!name) return '';
+  const parts = name.split(', ');
+  if (parts.length === 2) return parts[0];
+  const space = name.lastIndexOf(' ');
+  if (space > 0) return name.substring(space + 1);
+  return name;
+}
+
 function renderSidebar(games) {
-  const liveGames = games.filter(g => g.statusClass === 'live').length;
   const sidebar = document.getElementById('sidebar');
   let html = `<div class="sidebar-header">
     <span>All Games</span>
@@ -1103,11 +1064,14 @@ function renderSidebar(games) {
     const isActive = g.gamePk === spotlightGamePk;
     const awayWin = g.statusClass === 'final' && g.away.score > g.home.score;
     const homeWin = g.statusClass === 'final' && g.home.score > g.away.score;
+    const isLive = g.statusClass === 'live';
+    const pitcherLine = (g.awayPitcher || g.homePitcher) ? `${shortenPitcher(g.awayPitcher)} vs ${shortenPitcher(g.homePitcher)}` : '';
+
     html += `<div class="game-card ${isActive ? 'active' : ''}" onclick="setSpotlight(${g.gamePk})">
       <div class="game-status ${g.statusClass}">
-        ${g.statusClass === 'live' ? '<span class="live-dot"></span>' : ''}
+        ${isLive ? '<span class="live-dot"></span>' : ''}
         ${g.status}
-        ${g.statusClass === 'live' ? ` · ${g.outs} out` : ''}
+        ${isLive ? ` · ${g.outs} out` : ''}
       </div>
       <div class="game-teams">
         <div class="game-team-row">
@@ -1125,24 +1089,13 @@ function renderSidebar(games) {
           <span class="team-score ${homeWin ? 'winner' : ''}">${g.home.score}</span>
         </div>
       </div>
-      ${g.statusClass === 'live' ? renderRunners(g.runners) : ''}
+      <div class="game-meta">
+        <span class="game-pitchers">${pitcherLine}</span>
+        ${isLive ? `<div class="game-runners-wrap">${renderRunners(g.runners, 26)}</div>` : ''}
+      </div>
     </div>`;
   }
   sidebar.innerHTML = html;
-}
-
-function renderRunners(runners) {
-  const size = 28;
-  const d = 8;
-  const cx = size/2, cy = size/2;
-  const onColor = '#22c55e';
-  const offColor = 'rgba(255,255,255,0.08)';
-  const stroke = 'rgba(255,255,255,0.15)';
-  return `<svg width="${size}" height="${size}" style="margin-top:4px" viewBox="0 0 ${size} ${size}">
-    <rect x="${cx}" y="${cy-d-2}" width="${d}" height="${d}" rx="1" transform="rotate(45 ${cx+d/2} ${cy-d/2-2})" fill="${runners.second ? onColor : offColor}" stroke="${stroke}" stroke-width="0.5"/>
-    <rect x="${cx+d}" y="${cy}" width="${d}" height="${d}" rx="1" transform="rotate(45 ${cx+d+d/2} ${cy+d/2})" fill="${runners.first ? onColor : offColor}" stroke="${stroke}" stroke-width="0.5"/>
-    <rect x="${cx-d}" y="${cy}" width="${d}" height="${d}" rx="1" transform="rotate(45 ${cx-d+d/2} ${cy+d/2})" fill="${runners.third ? onColor : offColor}" stroke="${stroke}" stroke-width="0.5"/>
-  </svg>`;
 }
 
 function renderMain() {
@@ -1174,15 +1127,15 @@ function renderMain() {
           <div class="spotlight-detail">
             <div class="spotlight-detail-item">
               <div class="spotlight-detail-label">Inning</div>
-              <div class="spotlight-detail-value">${g.statusClass === 'live' ? g.status : g.status}</div>
+              <div class="spotlight-detail-value">${g.status}</div>
             </div>
             <div class="spotlight-detail-item">
               <div class="spotlight-detail-label">Outs</div>
               <div class="spotlight-detail-value">${g.outs}</div>
             </div>
             <div class="spotlight-detail-item">
-              <div class="spotlight-detail-label">Runners</div>
-              <div class="spotlight-detail-value">${[g.runners.first && '1B', g.runners.second && '2B', g.runners.third && '3B'].filter(Boolean).join(', ') || 'None'}</div>
+              <div class="spotlight-detail-label">Bases</div>
+              <div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div>
             </div>
           </div>
         </div>
@@ -1348,7 +1301,7 @@ function renderStandings() {
     return `<div class="standing-item">
       <span class="standing-rank">${s.rank}.</span>
       <span class="standing-team">${s.team}</span>
-      <span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : s.gb === '—' ? 'var(--white-dim)' : 'var(--white-dim)'}">${s.gb}</span>
+      <span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : 'var(--white-dim)'}">${s.gb}</span>
     </div>`;
   }).join('');
 }
@@ -1386,10 +1339,7 @@ function saveTheCall() {
   renderMain();
 }
 
-function cancelCallEdit() {
-  editingCall = false;
-  renderMain();
-}
+function cancelCallEdit() { editingCall = false; renderMain(); }
 
 function editStatOfDay() {
   editingStat = true;
@@ -1409,10 +1359,7 @@ function saveStatOfDay() {
   renderMain();
 }
 
-function cancelStatEdit() {
-  editingStat = false;
-  renderMain();
-}
+function cancelStatEdit() { editingStat = false; renderMain(); }
 
 // -- Player Search --
 let searchMode = 'hitter';
@@ -1433,22 +1380,31 @@ function closePlayerSearch() {
 
 function renderSearchResults(query) {
   const el = document.getElementById('playerSearchResults');
-  const typeFilter = searchMode === 'pitcher' ? 'pitcher' : 'hitter';
+  if (!PLAYER_DB.length) {
+    el.innerHTML = '<div style="padding:12px;color:var(--white-dim);text-align:center;font-size:13px">Loading players...</div>';
+    return;
+  }
+  const q = (query || '').toLowerCase();
   let results = PLAYER_DB.filter(p => {
     const matchType = searchMode === 'pitcher' ? p.type === 'pitcher' : p.type === 'hitter';
-    const matchQuery = !query || p.name.toLowerCase().includes(query.toLowerCase());
+    const matchQuery = !q || p.name.toLowerCase().includes(q);
     return matchType && matchQuery;
   });
-
-  el.innerHTML = results.map(p => `<div class="player-search-result" onclick="selectPlayer(${p.id}, '${p.name.replace("'","\\'")}', '${p.team}', '${p.pos}')">
-    <span class="name">${p.name}</span>
-    <span class="meta">${p.team} · ${p.pos}</span>
-  </div>`).join('');
+  if (!q) results = results.slice(0, 25);
+  else results = results.slice(0, 40);
+  const countLabel = playerDBLoaded ? `${PLAYER_DB.filter(p => searchMode === 'pitcher' ? p.type === 'pitcher' : p.type === 'hitter').length} players available` : '';
+  el.innerHTML = (countLabel && !q ? `<div style="padding:4px 10px 8px;font-size:10px;color:var(--white-dim);letter-spacing:0.5px">${countLabel} — type to search</div>` : '') +
+    results.map(p => {
+      const safeName = p.name.replace(/'/g, "\\'");
+      return `<div class="player-search-result" onclick="selectPlayer(${p.id}, '${safeName}', '${p.team}', '${p.pos}')">
+        <span class="name">${p.name}</span>
+        <span class="meta">${p.team} · ${p.pos}</span>
+      </div>`;
+    }).join('');
 }
 
 async function selectPlayer(id, name, team, pos) {
   closePlayerSearch();
-
   if (searchMode === 'pitcher') {
     state.pitcherOfDay = {
       name, team, position: pos, number: '--',
@@ -1488,25 +1444,21 @@ async function fetchHitterStats(playerId) {
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
       const last7 = glData.stats[0].splits.slice(-7);
       if (last7.length > 0) {
-        let ab=0, h=0, hr=0, rbi=0, bb=0, sb=0, pa=0, tb=0;
+        let ab=0, h=0, hr=0, rbi=0, bb=0, sb=0, tb=0;
         last7.forEach(g => {
           const s = g.stat;
           ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0;
           rbi += s.rbi||0; bb += s.baseOnBalls||0; sb += s.stolenBases||0;
-          pa += s.plateAppearances||0; tb += s.totalBases||0;
+          tb += s.totalBases||0;
         });
         state.hitterOfDay.last7 = {
-          avg: ab > 0 ? (h/ab).toFixed(3) : '-',
-          hr, rbi,
-          ops: ab > 0 ? ((h+bb)/(ab+bb) + tb/ab).toFixed(3) : '-',
-          sb, woba: '-'
+          avg: ab > 0 ? (h/ab).toFixed(3) : '-', hr, rbi,
+          ops: ab > 0 ? ((h+bb)/(ab+bb) + tb/ab).toFixed(3) : '-', sb, woba: '-'
         };
         renderMain();
       }
     }
-  } catch(e) {
-    console.log('Stats fetch failed:', e);
-  }
+  } catch(e) { console.log('Stats fetch failed:', e); }
 }
 
 async function fetchPitcherStats(playerId) {
@@ -1529,26 +1481,21 @@ async function fetchPitcherStats(playerId) {
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
       const last7days = glData.stats[0].splits.slice(-3);
       if (last7days.length > 0) {
-        let w=0, l=0, ip=0, k=0, h=0, bb=0, er=0, ab=0, hits=0;
+        let w=0, l=0, ip=0, k=0, bb=0, er=0, hits=0;
         last7days.forEach(g => {
           const s = g.stat;
           w += s.wins||0; l += s.losses||0;
           ip += parseFloat(s.inningsPitched||0); k += s.strikeOuts||0;
-          er += s.earnedRuns||0; bb += s.baseOnBalls||0;
-          hits += s.hits||0;
-          ab += s.atBats || ((parseFloat(s.inningsPitched||0)*3) + (s.hits||0));
+          er += s.earnedRuns||0; bb += s.baseOnBalls||0; hits += s.hits||0;
         });
-        const era = ip > 0 ? ((er / ip) * 9).toFixed(2) : '-';
-        const whip = ip > 0 ? ((hits + bb) / ip).toFixed(2) : '-';
         state.pitcherOfDay.last7 = {
-          w, l, era, ip: ip.toFixed(1), k, whip, avg: '-'
+          w, l, era: ip > 0 ? ((er / ip) * 9).toFixed(2) : '-',
+          ip: ip.toFixed(1), k, whip: ip > 0 ? ((hits + bb) / ip).toFixed(2) : '-', avg: '-'
         };
         renderMain();
       }
     }
-  } catch(e) {
-    console.log('Stats fetch failed:', e);
-  }
+  } catch(e) { console.log('Stats fetch failed:', e); }
 }
 
 document.getElementById('playerSearchInput').addEventListener('input', (e) => {
@@ -1563,25 +1510,23 @@ async function refreshData() {
   const btn = document.getElementById('refreshBtn');
   btn.textContent = '...';
   const apiGames = await tryAPI();
-  if (apiGames) {
-    state.games = apiGames;
-  }
+  if (apiGames) state.games = apiGames;
+  await fetchHotCold();
   renderSidebar(state.games);
   renderMain();
   btn.textContent = 'Refresh';
 }
 
-// -- Auto-refresh every 15s --
 setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) {
     state.games = apiGames;
+    await fetchHotCold();
     renderSidebar(state.games);
     renderMain();
   }
 }, 15000);
 
-// -- Init --
 async function init() {
   const mock = getMockPlayerData();
   state.pitcherOfDay = mock.pitcherOfDay;
@@ -1590,8 +1535,11 @@ async function init() {
   state.coldPlayers = mock.coldPlayers;
   state.standings = mock.standings;
 
+  loadFullPlayerDB();
+
   const apiGames = await tryAPI();
   state.games = apiGames || getMockGames();
+  if (useAPI) await fetchHotCold();
 
   renderSidebar(state.games);
   renderMain();
