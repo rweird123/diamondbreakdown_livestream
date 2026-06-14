@@ -892,46 +892,56 @@ function getTeamAbbrev(leader) {
   return '';
 }
 
-// -- Hot/Cold API fetch --
+// -- Hot/Cold: L7 OPS from game logs --
+async function computeL7(playerId) {
+  try {
+    const season = new Date().getFullYear();
+    const r = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=hitting`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (!d.stats || !d.stats[0] || !d.stats[0].splits) return null;
+    const last7 = d.stats[0].splits.slice(-7);
+    if (last7.length < 3) return null;
+    let ab=0, h=0, hr=0, bb=0, tb=0;
+    last7.forEach(g => {
+      const s = g.stat;
+      ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0;
+      bb += s.baseOnBalls||0; tb += s.totalBases||0;
+    });
+    if (ab < 15) return null;
+    const avg = (h/ab).toFixed(3);
+    const obp = (h+bb)/(ab+bb);
+    const slg = tb/ab;
+    const ops = (obp + slg).toFixed(3);
+    return { avg, hr: String(hr), ops };
+  } catch(e) { return null; }
+}
+
 async function fetchHotCold() {
   if (!useAPI) return;
   try {
     const season = new Date().getFullYear();
-    const [opsResp, avgResp, hrResp] = await Promise.all([
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=onBasePlusSlugging&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team,person(stats(type=season))`),
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=battingAverage&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team`),
-      fetch(`${MLB_API}/stats/leaders?leaderCategories=homeRuns&season=${season}&statGroup=hitting&limit=10&statType=season&gameTypes=R&hydrate=team`)
+    const resp = await fetch(`${MLB_API}/stats/leaders?leaderCategories=onBasePlusSlugging&season=${season}&statGroup=hitting&limit=40&statType=season&gameTypes=R`);
+    if (!resp.ok) return;
+    const data = await resp.json();
+    if (!data.leagueLeaders || !data.leagueLeaders[0]) return;
+    const pool = data.leagueLeaders[0].leaders;
+    const topPool = pool.slice(0, 15);
+    const bottomPool = pool.slice(-15);
+    const [topResults, bottomResults] = await Promise.all([
+      Promise.all(topPool.map(async l => {
+        const l7 = await computeL7(l.person.id);
+        return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null;
+      })),
+      Promise.all(bottomPool.map(async l => {
+        const l7 = await computeL7(l.person.id);
+        return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null;
+      }))
     ]);
-    const hotMap = {};
-    if (opsResp.ok) {
-      const d = await opsResp.json();
-      if (d.leagueLeaders && d.leagueLeaders[0]) {
-        d.leagueLeaders[0].leaders.slice(0, 10).forEach(l => {
-          hotMap[l.person.id] = { name: l.person.fullName, team: getTeamAbbrev(l), ops: l.value, avg: '-', hr: '-' };
-        });
-      }
-    }
-    if (avgResp.ok) {
-      const d = await avgResp.json();
-      if (d.leagueLeaders && d.leagueLeaders[0]) {
-        d.leagueLeaders[0].leaders.forEach(l => {
-          if (hotMap[l.person.id]) hotMap[l.person.id].avg = l.value;
-        });
-      }
-    }
-    if (hrResp.ok) {
-      const d = await hrResp.json();
-      if (d.leagueLeaders && d.leagueLeaders[0]) {
-        d.leagueLeaders[0].leaders.forEach(l => {
-          if (hotMap[l.person.id]) hotMap[l.person.id].hr = l.value;
-        });
-      }
-    }
-    const sorted = Object.values(hotMap).sort((a, b) => parseFloat(b.ops) - parseFloat(a.ops));
-    if (sorted.length >= 5) {
-      state.hotPlayers = sorted.slice(0, 5).map(p => ({ name: p.name, team: p.team, ops: p.ops, avg: p.avg, hr: p.hr }));
-      state.coldPlayers = sorted.slice(-5).reverse().map(p => ({ name: p.name, team: p.team, ops: p.ops, avg: p.avg, hr: p.hr }));
-    }
+    const hot = topResults.filter(Boolean).sort((a,b) => parseFloat(b.ops) - parseFloat(a.ops));
+    const cold = bottomResults.filter(Boolean).sort((a,b) => parseFloat(a.ops) - parseFloat(b.ops));
+    if (hot.length >= 5) state.hotPlayers = hot.slice(0, 5);
+    if (cold.length >= 5) state.coldPlayers = cold.slice(0, 5);
   } catch(e) { console.log('Hot/cold fetch failed:', e); }
 }
 
@@ -979,36 +989,45 @@ async function fetchStandings() {
   if (!useAPI) return;
   try {
     const season = new Date().getFullYear();
-    const resp = await fetch(`${MLB_API}/standings?leagueId=103,104&season=${season}&standingsTypes=wildCard&hydrate=team`);
+    const resp = await fetch(`${MLB_API}/standings?leagueId=103,104&season=${season}&standingsTypes=regularSeason&hydrate=team`);
     if (!resp.ok) return;
     const data = await resp.json();
     if (!data.records) return;
-    const wcTeams = [];
+    const alTeams = [], nlTeams = [];
     data.records.forEach(rec => {
-      const league = rec.league ? rec.league.abbreviation : '';
+      const leagueId = rec.league ? rec.league.id : 0;
+      const isAL = leagueId === 103;
       rec.teamRecords.forEach(tr => {
-        const abbr = tr.team ? (tr.team.abbreviation || TEAM_ABBREVS[tr.team.id] || '') : '';
-        wcTeams.push({
+        const abbr = tr.team ? (tr.team.abbreviation || TEAM_ABBREVS[tr.team.id] || tr.team.name.substring(0,3).toUpperCase()) : '';
+        const entry = {
           team: abbr,
-          league,
-          w: tr.wins,
-          l: tr.losses,
+          w: tr.wins || 0,
+          l: tr.losses || 0,
+          pct: parseFloat(tr.winningPercentage || '.000'),
           wcRank: tr.wildCardRank ? parseInt(tr.wildCardRank) : 99,
-          wcGb: tr.wildCardGamesBack || '-',
+          wcGb: tr.wildCardGamesBack || '0',
           divRank: tr.divisionRank ? parseInt(tr.divisionRank) : 99,
-          pct: tr.winningPercentage || '.000'
-        });
+          wcElim: tr.wildCardEliminationNumber || '-'
+        };
+        if (isAL) alTeams.push(entry);
+        else nlTeams.push(entry);
       });
     });
-    const al = wcTeams.filter(t => t.league === 'AL').sort((a,b) => a.wcRank - b.wcRank).slice(0, 6);
-    const nl = wcTeams.filter(t => t.league === 'NL').sort((a,b) => a.wcRank - b.wcRank).slice(0, 6);
-    if (al.length || nl.length) {
+    alTeams.sort((a,b) => a.wcRank - b.wcRank);
+    nlTeams.sort((a,b) => a.wcRank - b.wcRank);
+    const al6 = alTeams.slice(0, 6);
+    const nl6 = nlTeams.slice(0, 6);
+    if (al6.length || nl6.length) {
       state.standings = [];
-      al.forEach((t, i) => state.standings.push({ rank: i+1, team: t.team, gb: t.wcGb === '-' ? '—' : t.wcGb }));
+      al6.forEach((t, i) => {
+        const gb = t.wcGb === '0' || t.wcGb === '-' ? '—' : (parseFloat(t.wcGb) > 0 ? '-' + t.wcGb : '+' + Math.abs(parseFloat(t.wcGb)));
+        state.standings.push({ rank: i+1, team: t.team, gb });
+      });
       state.standings.push({ rank: '', team: '|', gb: '' });
-      nl.forEach((t, i) => state.standings.push({ rank: i+1, team: t.team, gb: t.wcGb === '-' ? '—' : t.wcGb }));
-      state.alStandings = al;
-      state.nlStandings = nl;
+      nl6.forEach((t, i) => {
+        const gb = t.wcGb === '0' || t.wcGb === '-' ? '—' : (parseFloat(t.wcGb) > 0 ? '-' + t.wcGb : '+' + Math.abs(parseFloat(t.wcGb)));
+        state.standings.push({ rank: i+1, team: t.team, gb });
+      });
       renderStandings();
     }
   } catch(e) { console.log('Standings fetch failed:', e); }
@@ -1367,13 +1386,13 @@ function renderMain() {
 
   const hotColdHtml = `<div class="card hotcold-card">
     <div class="card-header">
-      <span class="card-label">OPS Leaders</span>
-      <span class="card-badge green">Season</span>
+      <span class="card-label">Who's Hot & Cold</span>
+      <span class="card-badge green">Last 7 Games OPS</span>
     </div>
     <div class="card-body">
       <div class="hotcold-grid">
         <div>
-          <div class="hotcold-section-title hot">&#x1F525; Top 5</div>
+          <div class="hotcold-section-title hot">&#x1F525; On Fire</div>
           ${state.hotPlayers.map((p, i) => `<div class="hotcold-player hot-row">
             <div style="display:flex;align-items:center;gap:6px;min-width:0">
               <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
@@ -1381,14 +1400,14 @@ function renderMain() {
               <span class="hotcold-player-team">${p.team}</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span style="font-size:11px;color:var(--white-muted)">${p.avg} AVG</span>
-              <span style="font-size:11px;color:var(--white-muted)">${p.hr} HR</span>
-              <span class="hotcold-stat hot">${p.ops}</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span>
+              <span class="hotcold-stat hot" style="min-width:42px;text-align:right">${p.ops}</span>
             </div>
           </div>`).join('')}
         </div>
         <div>
-          <div class="hotcold-section-title cold">&#x1F976; Bottom 5</div>
+          <div class="hotcold-section-title cold">&#x1F976; Ice Cold</div>
           ${state.coldPlayers.map((p, i) => `<div class="hotcold-player cold-row">
             <div style="display:flex;align-items:center;gap:6px;min-width:0">
               <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
@@ -1396,9 +1415,9 @@ function renderMain() {
               <span class="hotcold-player-team">${p.team}</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span style="font-size:11px;color:var(--white-muted)">${p.avg} AVG</span>
-              <span style="font-size:11px;color:var(--white-muted)">${p.hr} HR</span>
-              <span class="hotcold-stat cold">${p.ops}</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span>
+              <span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span>
+              <span class="hotcold-stat cold" style="min-width:42px;text-align:right">${p.ops}</span>
             </div>
           </div>`).join('')}
         </div>
@@ -1753,7 +1772,7 @@ setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) {
     state.games = apiGames;
-    await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
+    await Promise.all([fetchLatestHomers(), fetchStandings()]);
     renderSidebar(state.games);
     if (!editingCall && !editingStat) renderMain();
   }
