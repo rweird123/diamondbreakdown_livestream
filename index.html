@@ -47,7 +47,6 @@ body {
   gap: 0;
 }
 
-/* ========== HEADER ========== */
 .header {
   grid-column: 1 / -1;
   display: flex;
@@ -60,67 +59,21 @@ body {
 }
 
 .header-left { display: flex; align-items: center; gap: 16px; }
-
 .header-title { display: flex; flex-direction: column; line-height: 1.1; }
+.header-title .brand { font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+.header-title .sub { font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--green-light); display: flex; align-items: center; gap: 6px; }
 
-.header-title .brand {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.header-title .sub {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--green-light);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.live-dot {
-  width: 7px;
-  height: 7px;
-  background: var(--live-green);
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-  box-shadow: 0 0 6px var(--live-green);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+.live-dot { width: 7px; height: 7px; background: var(--live-green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; box-shadow: 0 0 6px var(--live-green); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 .header-right { display: flex; align-items: center; gap: 20px; }
-
 .header-date { font-size: 13px; color: var(--white-muted); font-weight: 500; }
+.header-clock { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
 
-.header-clock {
-  font-size: 18px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 1px;
-}
-
-.api-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--white-dim);
-  background: rgba(255,255,255,0.04);
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
+.api-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--white-dim); background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 4px; }
 .api-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live-green); }
 .api-dot.offline { background: var(--red-primary); }
 
-/* ========== SCOREBOARD SIDEBAR ========== */
 .sidebar {
   background: rgba(0,0,0,0.2);
   border-right: 1px solid var(--border);
@@ -129,715 +82,186 @@ body {
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.1) transparent;
 }
-
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
 .sidebar-header {
   padding: 14px 14px 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--white-dim);
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--white-dim);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: rgba(11,15,30,0.95);
-  backdrop-filter: blur(8px);
-  z-index: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: sticky; top: 0;
+  background: rgba(11,15,30,0.95); backdrop-filter: blur(8px); z-index: 2;
+  display: flex; justify-content: space-between; align-items: center;
 }
 
-.game-count {
-  background: var(--green-primary);
-  color: var(--white);
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 3px;
-  font-weight: 700;
-}
+.game-count { background: var(--green-primary); color: var(--white); font-size: 10px; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
 
-.game-card {
-  padding: 8px 14px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background 0.15s;
-  position: relative;
-}
-
+.game-card { padding: 8px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; position: relative; }
 .game-card:hover { background: var(--bg-card-hover); }
-.game-card.active {
-  background: var(--bg-card);
-  border-left: 3px solid var(--green-primary);
-  padding-left: 11px;
-}
+.game-card.active { background: var(--bg-card); border-left: 3px solid var(--green-primary); padding-left: 11px; }
 
-.game-status {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
+.game-status { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
 .game-status.live { color: var(--live-green); }
 .game-status.final { color: var(--white-dim); }
 .game-status.pre { color: var(--hot-color); }
 
 .game-teams { display: flex; flex-direction: column; gap: 3px; }
-
-.game-team-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-}
-
+.game-team-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
 .team-info { display: flex; align-items: center; gap: 8px; min-width: 0; }
-
 .team-abbr { font-weight: 700; width: 32px; font-size: 13px; }
-
 .team-record { font-size: 10px; color: var(--white-dim); }
-
-.team-score {
-  font-weight: 800;
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-  min-width: 24px;
-  text-align: right;
-}
-
+.team-score { font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; min-width: 24px; text-align: right; }
 .team-score.winner { color: var(--green-light); }
 
-.game-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-}
+.game-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.game-pitchers { font-size: 10px; color: var(--white-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
+.game-runners-wrap { flex-shrink: 0; display: flex; align-items: center; }
 
-.game-pitchers {
-  font-size: 10px;
-  color: var(--white-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-
-.game-runners-wrap {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* ========== MAIN CONTENT ========== */
-.main {
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 16px 20px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-}
-
+.main { overflow-y: auto; overflow-x: hidden; padding: 16px 20px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
 .main::-webkit-scrollbar { width: 4px; }
 .main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-.main-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  min-width: 0;
-}
+.main-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; min-width: 0; }
 
-/* Cards */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  min-width: 0;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid var(--border);
-}
-
-.card-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--white-dim);
-}
-
-.card-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; min-width: 0; }
+.card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 10px; border-bottom: 1px solid var(--border); }
+.card-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--white-dim); }
+.card-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
 .card-badge.green { background: rgba(30,122,58,0.2); color: var(--green-light); }
 .card-badge.red { background: rgba(196,36,58,0.15); color: var(--red-light); }
-
 .card-body { padding: 14px 16px 16px; }
 
-/* Player of the Day Cards */
 .player-card { grid-column: span 1; }
-
-.player-hero {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.player-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  background: var(--bg-card-hover);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--white-dim);
-  flex-shrink: 0;
-  border: 2px solid var(--border);
-  overflow: hidden;
-}
-
+.player-hero { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+.player-avatar { width: 56px; height: 56px; border-radius: 8px; background: var(--bg-card-hover); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: var(--white-dim); flex-shrink: 0; border: 2px solid var(--border); overflow: hidden; }
 .player-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
 .player-info { min-width: 0; }
-
 .player-name { font-size: 18px; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
 .player-team { font-size: 12px; color: var(--white-dim); font-weight: 500; }
-.player-position {
-  font-size: 10px;
-  color: var(--green-light);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
+.player-position { font-size: 10px; color: var(--green-light); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
 .stat-row { display: grid; gap: 2px; margin-bottom: 10px; }
-
-.stat-row-header {
-  display: grid;
-  gap: 0;
-  font-size: 9px;
-  font-weight: 600;
-  color: var(--white-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 0 0 4px;
-  border-bottom: 1px solid var(--border);
-}
-
-.stat-row-values {
-  display: grid;
-  gap: 0;
-  font-size: 16px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  padding: 6px 0 0;
-}
-
-.hitter-stats .stat-row-header,
-.hitter-stats .stat-row-values {
-  grid-template-columns: repeat(6, 1fr);
-  text-align: center;
-}
-
-.pitcher-stats .stat-row-header,
-.pitcher-stats .stat-row-values {
-  grid-template-columns: repeat(6, 1fr);
-  text-align: center;
-}
-
-.stat-period {
-  font-size: 10px;
-  color: var(--white-dim);
-  font-weight: 600;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
+.stat-row-header { display: grid; gap: 0; font-size: 9px; font-weight: 600; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1px; padding: 0 0 4px; border-bottom: 1px solid var(--border); }
+.stat-row-values { display: grid; gap: 0; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; padding: 6px 0 0; }
+.hitter-stats .stat-row-header, .hitter-stats .stat-row-values { grid-template-columns: repeat(6, 1fr); text-align: center; }
+.pitcher-stats .stat-row-header, .pitcher-stats .stat-row-values { grid-template-columns: repeat(6, 1fr); text-align: center; }
+.stat-period { font-size: 10px; color: var(--white-dim); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
 .stat-highlight { color: var(--green-light); }
 
-/* Input fields */
-.editable-input {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--white);
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 13px;
-  width: 100%;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
+.editable-input { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; color: var(--white); padding: 8px 12px; font-family: inherit; font-size: 13px; width: 100%; outline: none; transition: border-color 0.2s; }
 .editable-input:focus { border-color: var(--green-primary); }
 .editable-input::placeholder { color: var(--white-dim); }
 textarea.editable-input { resize: vertical; min-height: 48px; }
 
-/* Hot & Cold */
 .hotcold-card { grid-column: 1 / -1; }
-
-.hotcold-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.hotcold-section-title {
-  font-size: 13px;
-  font-weight: 800;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+.hotcold-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.hotcold-section-title { font-size: 13px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .hotcold-section-title.hot { color: var(--hot-color); }
 .hotcold-section-title.cold { color: var(--cold-color); }
-
-.hotcold-player {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  border-radius: 6px;
-  margin-bottom: 4px;
-  font-size: 12px;
-  transition: background 0.15s;
-}
-
+.hotcold-player { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; border-radius: 6px; margin-bottom: 4px; font-size: 12px; transition: background 0.15s; }
 .hotcold-player.hot-row { background: var(--hot-bg); }
 .hotcold-player.cold-row { background: var(--cold-bg); }
-
 .hotcold-player-name { font-weight: 700; font-size: 13px; }
 .hotcold-player-team { color: var(--white-dim); font-size: 11px; margin-left: 6px; }
-
-.hotcold-stat {
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  font-size: 14px;
-}
-
+.hotcold-stat { font-weight: 800; font-variant-numeric: tabular-nums; font-size: 14px; }
 .hotcold-stat.hot { color: var(--hot-color); }
 .hotcold-stat.cold { color: var(--cold-color); }
-.hotcold-stat-label { font-size: 10px; color: var(--white-dim); margin-left: 4px; }
 
-/* The Call & Stat of the Day */
 .call-card, .stat-card { grid-column: span 1; }
-
-.call-prediction {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.4;
-  padding: 12px 14px;
-  background: rgba(30,122,58,0.08);
-  border: 1px solid var(--border-accent);
-  border-radius: 8px;
-  min-height: 60px;
-}
-
+.call-prediction { font-size: 16px; font-weight: 700; line-height: 1.4; padding: 12px 14px; background: rgba(30,122,58,0.08); border: 1px solid var(--border-accent); border-radius: 8px; min-height: 60px; }
 .call-status { display: flex; gap: 8px; margin-top: 10px; }
-
-.call-btn {
-  padding: 5px 14px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--white-dim);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
+.call-btn { padding: 5px 14px; border-radius: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--border); background: transparent; color: var(--white-dim); cursor: pointer; transition: all 0.15s; }
 .call-btn:hover { background: rgba(255,255,255,0.05); }
 .call-btn.pending { border-color: var(--hot-color); color: var(--hot-color); }
 .call-btn.hit { border-color: var(--green-light); color: var(--green-light); background: rgba(34,197,94,0.1); }
 .call-btn.miss { border-color: var(--red-primary); color: var(--red-light); background: rgba(196,36,58,0.1); }
 
 .stat-featured { text-align: center; padding: 10px 0; }
+.stat-big-number { font-size: 42px; font-weight: 900; color: var(--green-light); line-height: 1; margin-bottom: 6px; }
+.stat-description { font-size: 13px; color: var(--white-muted); line-height: 1.4; max-width: 280px; margin: 0 auto; }
 
-.stat-big-number {
-  font-size: 42px;
-  font-weight: 900;
-  color: var(--green-light);
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.stat-description {
-  font-size: 13px;
-  color: var(--white-muted);
-  line-height: 1.4;
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-/* Spotlight / Game Detail */
 .spotlight-card { grid-column: 1 / -1; }
-
-.spotlight-matchup {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 30px;
-  padding: 10px 0;
-}
-
+.spotlight-matchup { display: flex; align-items: center; justify-content: center; gap: 30px; padding: 10px 0; }
 .spotlight-team { text-align: center; }
 .spotlight-team-name { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
 .spotlight-team-record { font-size: 11px; color: var(--white-dim); }
-
-.spotlight-score {
-  font-size: 48px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 2px;
-}
-
-.spotlight-vs { font-size: 12px; color: var(--white-dim); font-weight: 600; }
-
-.spotlight-detail {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.spotlight-detail-item {
-  text-align: center;
-  padding: 8px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 6px;
-}
-
-.spotlight-detail-label {
-  font-size: 10px;
-  color: var(--white-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-
+.spotlight-score { font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+.spotlight-detail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.spotlight-detail-item { text-align: center; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; }
+.spotlight-detail-label { font-size: 10px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .spotlight-detail-value { font-size: 15px; font-weight: 700; }
+.spotlight-bases-wrap { display: flex; align-items: center; justify-content: center; }
 
-.spotlight-bases-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Player Search Overlay */
-.player-search-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-
+.player-search-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 .player-search-overlay.active { display: flex; }
-
-.player-search-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border-accent);
-  border-radius: 12px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90vw;
-}
-
-.player-search-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--white-dim);
-}
-
-.player-search-input {
-  width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--white);
-  font-size: 15px;
-  font-family: inherit;
-  outline: none;
-  margin-bottom: 10px;
-}
-
+.player-search-box { background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 12px; padding: 20px; width: 400px; max-width: 90vw; }
+.player-search-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--white-dim); }
+.player-search-input { width: 100%; padding: 10px 14px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-size: 15px; font-family: inherit; outline: none; margin-bottom: 10px; }
 .player-search-input:focus { border-color: var(--green-primary); }
-
 .player-search-results { max-height: 250px; overflow-y: auto; }
-
-.player-search-result {
-  padding: 8px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  transition: background 0.1s;
-}
-
+.player-search-result { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; transition: background 0.1s; }
 .player-search-result:hover { background: var(--bg-card-hover); }
 .player-search-result .name { font-weight: 700; }
 .player-search-result .meta { color: var(--white-dim); font-size: 11px; }
 
-/* ========== BOTTOM BAR ========== */
 .bottom-bar {
   grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.3);
-  font-size: 11px;
-  color: var(--white-dim);
-  gap: 20px;
-  min-height: 48px;
+  display: flex; align-items: center; padding: 0 24px;
+  border-top: 1px solid var(--border); background: rgba(0,0,0,0.3);
+  font-size: 11px; color: var(--white-dim); gap: 20px; min-height: 48px;
+  overflow: hidden;
 }
-
-.bottom-standings {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  flex: 1;
-}
-
-.standing-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
+.bottom-standings { display: flex; gap: 16px; overflow-x: auto; flex: 1; }
+.standing-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .standing-rank { font-weight: 800; color: var(--white); font-size: 12px; }
 .standing-team { font-weight: 600; color: var(--white-muted); }
+.bottom-label { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green-light); white-space: nowrap; flex-shrink: 0; position: relative; z-index: 2; }
 
-.bottom-label {
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--green-light);
-  white-space: nowrap;
-}
-
-/* Control Panel */
-.controls {
-  position: fixed;
-  top: 72px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 50;
-}
-
-.ctrl-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: var(--white-dim);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-
+.controls { position: fixed; top: 72px; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
+.ctrl-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--white-dim); padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; white-space: nowrap; }
 .ctrl-btn:hover { background: var(--bg-card-hover); color: var(--white); }
 .ctrl-btn.active { border-color: var(--green-primary); color: var(--green-light); }
 
-/* Inline Edit Forms */
 .inline-edit-form { display: flex; flex-direction: column; gap: 8px; }
-
-.inline-edit-form input,
-.inline-edit-form textarea {
-  background: var(--bg-deep);
-  border: 1px solid var(--border-accent);
-  border-radius: 6px;
-  color: var(--white);
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 14px;
-  width: 100%;
-  outline: none;
-}
-
+.inline-edit-form input, .inline-edit-form textarea { background: var(--bg-deep); border: 1px solid var(--border-accent); border-radius: 6px; color: var(--white); padding: 8px 12px; font-family: inherit; font-size: 14px; width: 100%; outline: none; }
 .inline-edit-form textarea { resize: vertical; min-height: 50px; }
 .inline-edit-form input:focus, .inline-edit-form textarea:focus { border-color: var(--green-primary); }
-
 .inline-edit-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.inline-edit-actions button { padding: 5px 14px; border-radius: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--border); background: transparent; color: var(--white-dim); cursor: pointer; font-family: inherit; }
+.inline-edit-actions .save-btn { border-color: var(--green-primary); color: var(--green-light); background: rgba(30,122,58,0.15); }
 
-.inline-edit-actions button {
-  padding: 5px 14px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--white-dim);
-  cursor: pointer;
-  font-family: inherit;
-}
+@media print { body { overflow: visible; } .dashboard { display: block; height: auto; } .controls { display: none; } .sidebar { page-break-after: always; } }
 
-.inline-edit-actions .save-btn {
-  border-color: var(--green-primary);
-  color: var(--green-light);
-  background: rgba(30,122,58,0.15);
-}
-
-/* Print */
-@media print {
-  body { overflow: visible; }
-  .dashboard { display: block; height: auto; }
-  .controls { display: none; }
-  .sidebar { page-break-after: always; }
-}
-
-/* ========== STREAM MODE ========== */
 body.stream-mode .controls { display: none; }
 
-/* ========== ERA COLORS ========== */
 .era-elite { color: #22c55e; }
 .era-good { color: #86efac; }
 .era-avg { color: #fbbf24; }
 .era-bad { color: #f87171; }
 
-/* ========== HR FLASH ========== */
-@keyframes hrFlash {
-  0% { background: rgba(196,36,58,0.08); }
-  25% { background: rgba(196,36,58,0.25); }
-  50% { background: rgba(196,36,58,0.08); }
-  75% { background: rgba(196,36,58,0.25); }
-  100% { background: rgba(196,36,58,0.08); }
-}
+@keyframes hrFlash { 0% { background: rgba(196,36,58,0.08); } 25% { background: rgba(196,36,58,0.25); } 50% { background: rgba(196,36,58,0.08); } 75% { background: rgba(196,36,58,0.25); } 100% { background: rgba(196,36,58,0.08); } }
 .hr-new { animation: hrFlash 1.5s ease; }
 
-/* ========== TICKER ========== */
-.bottom-standings.ticker {
-  animation: ticker 30s linear infinite;
-}
-@keyframes ticker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+.bottom-standings.ticker { animation: ticker 30s linear infinite; overflow: hidden; }
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .bottom-standings.ticker:hover { animation-play-state: paused; }
 
-/* ========== SPOTLIGHT LINE SCORE ========== */
-.linescore-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
-  margin-top: 12px;
-}
-.linescore-table th, .linescore-table td {
-  padding: 4px 6px;
-  text-align: center;
-  font-size: 12px;
-  border-bottom: 1px solid var(--border);
-  min-width: 22px;
-}
-.linescore-table th {
-  color: var(--white-dim);
-  font-weight: 600;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+.linescore-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: 12px; }
+.linescore-table th, .linescore-table td { padding: 4px 6px; text-align: center; font-size: 12px; border-bottom: 1px solid var(--border); min-width: 22px; }
+.linescore-table th { color: var(--white-dim); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 .linescore-table td { font-weight: 600; }
-.linescore-table td.team-col {
-  text-align: left;
-  font-weight: 700;
-  font-size: 13px;
-  min-width: 40px;
-}
+.linescore-table td.team-col { text-align: left; font-weight: 700; font-size: 13px; min-width: 40px; }
 .linescore-table td.rhe { font-weight: 800; border-left: 1px solid rgba(255,255,255,0.1); }
 .linescore-table tr.winner td.rhe:first-of-type { color: var(--green-light); }
 
-/* ========== SPOTLIGHT PLAY-BY-PLAY ========== */
-.play-feed {
-  max-height: 120px;
-  overflow-y: auto;
-  margin-top: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.1) transparent;
-}
+.play-feed { max-height: 120px; overflow-y: auto; margin-top: 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; }
 .play-feed::-webkit-scrollbar { width: 3px; }
 .play-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.play-item {
-  padding: 5px 8px;
-  font-size: 12px;
-  color: var(--white-muted);
-  border-left: 2px solid var(--border);
-  margin-bottom: 4px;
-}
-.play-item.scoring {
-  border-left-color: var(--green-light);
-  color: var(--white);
-  font-weight: 600;
-}
-.play-item .play-inning {
-  font-size: 10px;
-  color: var(--white-dim);
-  margin-right: 6px;
-}
+.play-item { padding: 5px 8px; font-size: 12px; color: var(--white-muted); border-left: 2px solid var(--border); margin-bottom: 4px; }
+.play-item.scoring { border-left-color: var(--green-light); color: var(--white); font-weight: 600; }
+.play-item .play-inning { font-size: 10px; color: var(--white-dim); margin-right: 6px; }
 
-/* ========== AUTO-ROTATE INDICATOR ========== */
-.auto-rotate-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  color: var(--green-light);
-  background: rgba(30,122,58,0.15);
-  padding: 2px 8px;
-  border-radius: 3px;
-  margin-left: 8px;
-}
+.auto-rotate-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--green-light); background: rgba(30,122,58,0.15); padding: 2px 8px; border-radius: 3px; margin-left: 8px; }
 </style>
 </head>
 <body>
@@ -907,7 +331,12 @@ let state = {
   latestHomers: []
 };
 
-// -- Time --
+// FIX: Use local date instead of UTC to avoid showing wrong day after ~7PM ET
+function getLocalDateStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 function updateClock() {
   const now = new Date();
   document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -916,10 +345,9 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// -- API --
 async function tryAPI() {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateStr();
     const resp = await fetch(`${MLB_API}/schedule?date=${today}&sportId=1&hydrate=linescore,team,probablePitcher`);
     if (!resp.ok) throw new Error('API error');
     const data = await resp.json();
@@ -975,9 +403,7 @@ function parseAPIGames(apiGames) {
   });
 }
 
-// -- Team abbreviation lookup --
 const TEAM_ABBREVS = {};
-
 async function loadTeamAbbrevs() {
   try {
     const resp = await fetch(`${MLB_API}/teams?sportId=1`);
@@ -997,7 +423,6 @@ function getTeamAbbrev(leader) {
   return '';
 }
 
-// -- Fetch pitcher ERAs for sidebar --
 async function fetchPitcherEras() {
   if (!useAPI || !state.games.length) return;
   const pitcherIds = new Set();
@@ -1016,19 +441,13 @@ async function fetchPitcherEras() {
       const d = await r.json();
       if (d.stats && d.stats[0] && d.stats[0].splits && d.stats[0].splits[0]) {
         const era = d.stats[0].splits[0].stat.era;
-        if (era && idToGames[id]) {
-          idToGames[id].forEach(({ game, side }) => {
-            if (side === 'away') game.awayPitcherEra = era;
-            else game.homePitcherEra = era;
-          });
-        }
+        if (era && idToGames[id]) { idToGames[id].forEach(({ game, side }) => { if (side === 'away') game.awayPitcherEra = era; else game.homePitcherEra = era; }); }
       }
     } catch(e) {}
   }));
   renderSidebar(state.games);
 }
 
-// -- Hot/Cold: L7 OPS from game logs --
 async function computeL7(playerId) {
   try {
     const season = new Date().getFullYear();
@@ -1039,11 +458,7 @@ async function computeL7(playerId) {
     const last7 = d.stats[0].splits.slice(-7);
     if (last7.length < 3) return null;
     let ab=0, h=0, hr=0, bb=0, tb=0;
-    last7.forEach(g => {
-      const s = g.stat;
-      ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0;
-      bb += s.baseOnBalls||0; tb += s.totalBases||0;
-    });
+    last7.forEach(g => { const s = g.stat; ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0; bb += s.baseOnBalls||0; tb += s.totalBases||0; });
     if (ab < 15) return null;
     const avg = (h/ab).toFixed(3);
     const obp = (h+bb)/(ab+bb);
@@ -1065,14 +480,8 @@ async function fetchHotCold() {
     const topPool = pool.slice(0, 15);
     const bottomPool = pool.slice(-15);
     const [topResults, bottomResults] = await Promise.all([
-      Promise.all(topPool.map(async l => {
-        const l7 = await computeL7(l.person.id);
-        return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null;
-      })),
-      Promise.all(bottomPool.map(async l => {
-        const l7 = await computeL7(l.person.id);
-        return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null;
-      }))
+      Promise.all(topPool.map(async l => { const l7 = await computeL7(l.person.id); return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null; })),
+      Promise.all(bottomPool.map(async l => { const l7 = await computeL7(l.person.id); return l7 ? { name: l.person.fullName, team: getTeamAbbrev(l), ...l7 } : null; }))
     ]);
     const hot = topResults.filter(Boolean).sort((a,b) => parseFloat(b.ops) - parseFloat(a.ops));
     const cold = bottomResults.filter(Boolean).sort((a,b) => parseFloat(a.ops) - parseFloat(b.ops));
@@ -1081,16 +490,13 @@ async function fetchHotCold() {
   } catch(e) { console.log('Hot/cold fetch failed:', e); }
 }
 
-// -- Latest Homers --
 async function fetchLatestHomers() {
   if (!useAPI) return;
   try {
     const activeGames = state.games.filter(g => g.statusClass === 'live' || g.statusClass === 'final');
     if (!activeGames.length) return;
     const gamesToFetch = activeGames.slice(0, 10);
-    const feeds = await Promise.all(gamesToFetch.map(g =>
-      fetch(`${MLB_API}/game/${g.gamePk}/playByPlay`).then(r => r.ok ? r.json() : null).catch(() => null)
-    ));
+    const feeds = await Promise.all(gamesToFetch.map(g => fetch(`${MLB_API}/game/${g.gamePk}/playByPlay`).then(r => r.ok ? r.json() : null).catch(() => null)));
     const allHRs = [];
     feeds.forEach((feed, i) => {
       if (!feed || !feed.allPlays) return;
@@ -1099,19 +505,8 @@ async function fetchLatestHomers() {
         if (play.result && play.result.event === 'Home Run' && play.matchup && play.matchup.batter) {
           let dist = null, ev = null;
           if (play.hitData) { dist = play.hitData.totalDistance; ev = play.hitData.launchSpeed; }
-          if (!dist && play.playEvents) {
-            const hitEvt = play.playEvents.find(e => e.hitData);
-            if (hitEvt && hitEvt.hitData) { dist = hitEvt.hitData.totalDistance; ev = hitEvt.hitData.launchSpeed; }
-          }
-          allHRs.push({
-            batter: play.matchup.batter.fullName,
-            distance: dist || null,
-            exitVelo: ev || null,
-            inning: play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '',
-            desc: play.result.description || '',
-            matchup: `${game.away.abbr} @ ${game.home.abbr}`,
-            startTime: play.about ? play.about.startTime : ''
-          });
+          if (!dist && play.playEvents) { const hitEvt = play.playEvents.find(e => e.hitData); if (hitEvt && hitEvt.hitData) { dist = hitEvt.hitData.totalDistance; ev = hitEvt.hitData.launchSpeed; } }
+          allHRs.push({ batter: play.matchup.batter.fullName, distance: dist || null, exitVelo: ev || null, inning: play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '', desc: play.result.description || '', matchup: `${game.away.abbr} @ ${game.home.abbr}`, startTime: play.about ? play.about.startTime : '' });
         }
       });
     });
@@ -1120,7 +515,6 @@ async function fetchLatestHomers() {
   } catch(e) { console.log('Homer fetch failed:', e); }
 }
 
-// -- Standings --
 async function fetchStandings() {
   if (!useAPI) return;
   try {
@@ -1135,18 +529,8 @@ async function fetchStandings() {
       const isAL = leagueId === 103;
       rec.teamRecords.forEach(tr => {
         const abbr = tr.team ? (tr.team.abbreviation || TEAM_ABBREVS[tr.team.id] || tr.team.name.substring(0,3).toUpperCase()) : '';
-        const entry = {
-          team: abbr,
-          w: tr.wins || 0,
-          l: tr.losses || 0,
-          pct: parseFloat(tr.winningPercentage || '.000'),
-          wcRank: tr.wildCardRank ? parseInt(tr.wildCardRank) : 99,
-          wcGb: tr.wildCardGamesBack || '0',
-          divRank: tr.divisionRank ? parseInt(tr.divisionRank) : 99,
-          wcElim: tr.wildCardEliminationNumber || '-'
-        };
-        if (isAL) alTeams.push(entry);
-        else nlTeams.push(entry);
+        const entry = { team: abbr, w: tr.wins || 0, l: tr.losses || 0, pct: parseFloat(tr.winningPercentage || '.000'), wcRank: tr.wildCardRank ? parseInt(tr.wildCardRank) : 99, wcGb: tr.wildCardGamesBack || '0', divRank: tr.divisionRank ? parseInt(tr.divisionRank) : 99, wcElim: tr.wildCardEliminationNumber || '-' };
+        if (isAL) alTeams.push(entry); else nlTeams.push(entry);
       });
     });
     alTeams.sort((a,b) => a.wcRank - b.wcRank);
@@ -1156,12 +540,14 @@ async function fetchStandings() {
     if (al6.length || nl6.length) {
       state.standings = [];
       al6.forEach((t, i) => {
-        const gb = t.wcGb === '0' || t.wcGb === '-' ? '—' : (parseFloat(t.wcGb) > 0 ? '-' + t.wcGb : '+' + Math.abs(parseFloat(t.wcGb)));
+        const raw = String(t.wcGb);
+        const gb = (raw === '0' || raw === '-') ? '—' : raw.startsWith('+') ? raw : '-' + raw;
         state.standings.push({ rank: i+1, team: t.team, gb });
       });
       state.standings.push({ rank: '', team: '|', gb: '' });
       nl6.forEach((t, i) => {
-        const gb = t.wcGb === '0' || t.wcGb === '-' ? '—' : (parseFloat(t.wcGb) > 0 ? '-' + t.wcGb : '+' + Math.abs(parseFloat(t.wcGb)));
+        const raw = String(t.wcGb);
+        const gb = (raw === '0' || raw === '-') ? '—' : raw.startsWith('+') ? raw : '-' + raw;
         state.standings.push({ rank: i+1, team: t.team, gb });
       });
       renderStandings();
@@ -1169,7 +555,6 @@ async function fetchStandings() {
   } catch(e) { console.log('Standings fetch failed:', e); }
 }
 
-// -- Mock Data --
 function getMockGames() {
   return [
     { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G', awayPitcherEra: '2.95', homePitcherEra: '3.82' },
@@ -1192,54 +577,17 @@ function getMockGames() {
 
 function getMockPlayerData() {
   return {
-    pitcherOfDay: {
-      name: 'Paul Skenes', team: 'PIT', position: 'SP', number: '30', playerId: 694973,
-      season: { w: 10, l: 2, era: '1.89', ip: '104.2', k: 142, whip: '0.87', avg: '.178' },
-      last7: { w: 2, l: 0, era: '0.64', ip: '14.0', k: 21, whip: '0.71', avg: '.122' },
-      tonight: { ip: '5.2', h: 2, r: 1, er: 1, k: 9, bb: 1, pitches: 87 }
-    },
-    hitterOfDay: {
-      name: 'Shohei Ohtani', team: 'LAD', position: 'DH', number: '17', playerId: 660271,
-      season: { avg: '.312', hr: 26, rbi: 62, ops: '1.048', sb: 18, woba: '.421' },
-      last7: { avg: '.435', hr: 4, rbi: 9, ops: '1.456', sb: 2, woba: '.518' },
-      tonight: { ab: 3, h: 2, hr: 1, rbi: 3, bb: 1, k: 0 }
-    },
-    hotPlayers: [
-      { name: 'Aaron Judge', team: 'NYY', ops: '1.145', avg: '.345', hr: '28' },
-      { name: 'Shohei Ohtani', team: 'LAD', ops: '1.048', avg: '.312', hr: '26' },
-      { name: 'Bobby Witt Jr.', team: 'KC', ops: '.982', avg: '.328', hr: '18' },
-      { name: 'Gunnar Henderson', team: 'BAL', ops: '.965', avg: '.298', hr: '22' },
-      { name: 'Mookie Betts', team: 'LAD', ops: '.948', avg: '.305', hr: '17' },
-    ],
-    coldPlayers: [
-      { name: 'Manny Machado', team: 'SD', ops: '.648', avg: '.238', hr: '8' },
-      { name: 'Marcus Semien', team: 'TEX', ops: '.665', avg: '.241', hr: '9' },
-      { name: 'Alex Bregman', team: 'HOU', ops: '.672', avg: '.245', hr: '7' },
-      { name: 'Bryce Harper', team: 'PHI', ops: '.690', avg: '.252', hr: '10' },
-      { name: 'Pete Alonso', team: 'NYM', ops: '.705', avg: '.228', hr: '14' },
-    ],
-    standings: [
-      { rank: 1, team: 'BAL', gb: '+3.0' }, { rank: 2, team: 'NYY', gb: '+1.5' },
-      { rank: 3, team: 'KC', gb: '—' }, { rank: 4, team: 'CLE', gb: '-0.5' },
-      { rank: 5, team: 'MIN', gb: '-2.0' }, { rank: 6, team: 'SEA', gb: '-3.0' },
-      { rank: '', team: '|', gb: '' },
-      { rank: 1, team: 'LAD', gb: '+5.0' }, { rank: 2, team: 'PHI', gb: '+2.5' },
-      { rank: 3, team: 'ATL', gb: '—' }, { rank: 4, team: 'MIL', gb: '-0.5' },
-      { rank: 5, team: 'SD', gb: '-2.0' }, { rank: 6, team: 'ARI', gb: '-3.5' },
-    ],
-    latestHomers: [
-      { batter: 'Shohei Ohtani', distance: 438, exitVelo: 112.4, inning: 'B3', matchup: 'LAD @ SF' },
-      { batter: 'Aaron Judge', distance: 421, exitVelo: 110.8, inning: 'T5', matchup: 'NYY @ BOS' },
-      { batter: 'Pete Alonso', distance: 405, exitVelo: 108.2, inning: 'B4', matchup: 'ATL @ NYM' },
-      { batter: 'Bobby Witt Jr.', distance: 412, exitVelo: 109.5, inning: 'B6', matchup: 'STL @ KC' },
-      { batter: 'Yordan Alvarez', distance: 398, exitVelo: 106.1, inning: 'T2', matchup: 'HOU @ TEX' },
-    ]
+    pitcherOfDay: { name: 'Paul Skenes', team: 'PIT', position: 'SP', number: '30', playerId: 694973, season: { w: 10, l: 2, era: '1.89', ip: '104.2', k: 142, whip: '0.87', avg: '.178' }, last7: { w: 2, l: 0, era: '0.64', ip: '14.0', k: 21, whip: '0.71', avg: '.122' }, tonight: { ip: '5.2', h: 2, r: 1, er: 1, k: 9, bb: 1, pitches: 87 } },
+    hitterOfDay: { name: 'Shohei Ohtani', team: 'LAD', position: 'DH', number: '17', playerId: 660271, season: { avg: '.312', hr: 26, rbi: 62, ops: '1.048', sb: 18, woba: '.421' }, last7: { avg: '.435', hr: 4, rbi: 9, ops: '1.456', sb: 2, woba: '.518' }, tonight: { ab: 3, h: 2, hr: 1, rbi: 3, bb: 1, k: 0 } },
+    hotPlayers: [ { name: 'Aaron Judge', team: 'NYY', ops: '1.145', avg: '.345', hr: '28' }, { name: 'Shohei Ohtani', team: 'LAD', ops: '1.048', avg: '.312', hr: '26' }, { name: 'Bobby Witt Jr.', team: 'KC', ops: '.982', avg: '.328', hr: '18' }, { name: 'Gunnar Henderson', team: 'BAL', ops: '.965', avg: '.298', hr: '22' }, { name: 'Mookie Betts', team: 'LAD', ops: '.948', avg: '.305', hr: '17' } ],
+    coldPlayers: [ { name: 'Manny Machado', team: 'SD', ops: '.648', avg: '.238', hr: '8' }, { name: 'Marcus Semien', team: 'TEX', ops: '.665', avg: '.241', hr: '9' }, { name: 'Alex Bregman', team: 'HOU', ops: '.672', avg: '.245', hr: '7' }, { name: 'Bryce Harper', team: 'PHI', ops: '.690', avg: '.252', hr: '10' }, { name: 'Pete Alonso', team: 'NYM', ops: '.705', avg: '.228', hr: '14' } ],
+    standings: [ { rank: 1, team: 'BAL', gb: '+3.0' }, { rank: 2, team: 'NYY', gb: '+1.5' }, { rank: 3, team: 'KC', gb: '—' }, { rank: 4, team: 'CLE', gb: '-0.5' }, { rank: 5, team: 'MIN', gb: '-2.0' }, { rank: 6, team: 'SEA', gb: '-3.0' }, { rank: '', team: '|', gb: '' }, { rank: 1, team: 'LAD', gb: '+5.0' }, { rank: 2, team: 'PHI', gb: '+2.5' }, { rank: 3, team: 'ATL', gb: '—' }, { rank: 4, team: 'MIL', gb: '-0.5' }, { rank: 5, team: 'SD', gb: '-2.0' }, { rank: 6, team: 'ARI', gb: '-3.5' } ],
+    latestHomers: [ { batter: 'Shohei Ohtani', distance: 438, exitVelo: 112.4, inning: 'B3', matchup: 'LAD @ SF' }, { batter: 'Aaron Judge', distance: 421, exitVelo: 110.8, inning: 'T5', matchup: 'NYY @ BOS' }, { batter: 'Pete Alonso', distance: 405, exitVelo: 108.2, inning: 'B4', matchup: 'ATL @ NYM' }, { batter: 'Bobby Witt Jr.', distance: 412, exitVelo: 109.5, inning: 'B6', matchup: 'STL @ KC' }, { batter: 'Yordan Alvarez', distance: 398, exitVelo: 106.1, inning: 'T2', matchup: 'HOU @ TEX' } ]
   };
 }
 
 let PLAYER_DB = [];
 let playerDBLoaded = false;
-
 const PITCHER_POSITIONS = new Set(['P','SP','RP','CP','CL']);
 
 async function loadFullPlayerDB() {
@@ -1254,289 +602,108 @@ async function loadFullPlayerDB() {
         const pos = p.primaryPosition ? p.primaryPosition.abbreviation : '';
         const isPitcher = PITCHER_POSITIONS.has(pos);
         let teamAbbr = '';
-        if (p.currentTeam) {
-          teamAbbr = p.currentTeam.abbreviation || TEAM_ABBREVS[p.currentTeam.id] || TEAM_ABBREVS[p.currentTeam.name] || '';
-        }
-        return {
-          id: p.id,
-          name: p.fullName,
-          team: teamAbbr,
-          pos: pos,
-          type: isPitcher ? 'pitcher' : 'hitter',
-          number: p.primaryNumber || ''
-        };
+        if (p.currentTeam) { teamAbbr = p.currentTeam.abbreviation || TEAM_ABBREVS[p.currentTeam.id] || TEAM_ABBREVS[p.currentTeam.name] || ''; }
+        return { id: p.id, name: p.fullName, team: teamAbbr, pos, type: isPitcher ? 'pitcher' : 'hitter', number: p.primaryNumber || '' };
       }).sort((a, b) => a.name.localeCompare(b.name));
       playerDBLoaded = true;
-      console.log(`Loaded ${PLAYER_DB.length} players from MLB API`);
     }
   } catch(e) {
-    console.log('Full player DB fetch failed, trying roster fallback:', e);
     try {
       if (!Object.keys(TEAM_ABBREVS).length) await loadTeamAbbrevs();
       const resp = await fetch(`${MLB_API}/teams?sportId=1&hydrate=roster(person(stats(type=[season])))`);
       if (resp.ok) {
         const data = await resp.json();
         const players = [];
-        if (data.teams) {
-          data.teams.forEach(team => {
-            const abbr = team.abbreviation || '';
-            if (team.roster && team.roster.roster) {
-              team.roster.roster.forEach(r => {
-                const pos = r.position ? r.position.abbreviation : '';
-                const isPitcher = PITCHER_POSITIONS.has(pos);
-                players.push({
-                  id: r.person.id,
-                  name: r.person.fullName,
-                  team: abbr,
-                  pos: pos,
-                  type: isPitcher ? 'pitcher' : 'hitter',
-                  number: r.jerseyNumber || ''
-                });
-              });
-            }
-          });
-        }
-        if (players.length > 0) {
-          PLAYER_DB = players.sort((a, b) => a.name.localeCompare(b.name));
-          playerDBLoaded = true;
-          console.log(`Loaded ${PLAYER_DB.length} players from roster fallback`);
-        }
+        if (data.teams) { data.teams.forEach(team => { const abbr = team.abbreviation || ''; if (team.roster && team.roster.roster) { team.roster.roster.forEach(r => { const pos = r.position ? r.position.abbreviation : ''; players.push({ id: r.person.id, name: r.person.fullName, team: abbr, pos, type: PITCHER_POSITIONS.has(pos) ? 'pitcher' : 'hitter', number: r.jerseyNumber || '' }); }); } }); }
+        if (players.length > 0) { PLAYER_DB = players.sort((a, b) => a.name.localeCompare(b.name)); playerDBLoaded = true; }
       }
-    } catch(e2) {
-      console.log('Roster fallback also failed:', e2);
-    }
+    } catch(e2) {}
     if (!PLAYER_DB.length) {
       PLAYER_DB = [
-        { id: 660271, name: 'Shohei Ohtani', team: 'LAD', pos: 'DH', type: 'hitter' },
-        { id: 592450, name: 'Aaron Judge', team: 'NYY', pos: 'RF', type: 'hitter' },
-        { id: 665489, name: 'Bobby Witt Jr.', team: 'KC', pos: 'SS', type: 'hitter' },
-        { id: 671096, name: 'Elly De La Cruz', team: 'CIN', pos: 'SS', type: 'hitter' },
-        { id: 683002, name: 'Gunnar Henderson', team: 'BAL', pos: 'SS', type: 'hitter' },
-        { id: 605141, name: 'Mookie Betts', team: 'LAD', pos: '2B', type: 'hitter' },
-        { id: 665742, name: 'Juan Soto', team: 'NYY', pos: 'RF', type: 'hitter' },
-        { id: 547180, name: 'Bryce Harper', team: 'PHI', pos: '1B', type: 'hitter' },
-        { id: 694973, name: 'Paul Skenes', team: 'PIT', pos: 'SP', type: 'pitcher' },
-        { id: 594798, name: 'Gerrit Cole', team: 'NYY', pos: 'SP', type: 'pitcher' },
-        { id: 669373, name: 'Tarik Skubal', team: 'DET', pos: 'SP', type: 'pitcher' },
-        { id: 605483, name: 'Corbin Burnes', team: 'BAL', pos: 'SP', type: 'pitcher' },
+        { id: 660271, name: 'Shohei Ohtani', team: 'LAD', pos: 'DH', type: 'hitter' }, { id: 592450, name: 'Aaron Judge', team: 'NYY', pos: 'RF', type: 'hitter' },
+        { id: 665489, name: 'Bobby Witt Jr.', team: 'KC', pos: 'SS', type: 'hitter' }, { id: 671096, name: 'Elly De La Cruz', team: 'CIN', pos: 'SS', type: 'hitter' },
+        { id: 683002, name: 'Gunnar Henderson', team: 'BAL', pos: 'SS', type: 'hitter' }, { id: 605141, name: 'Mookie Betts', team: 'LAD', pos: '2B', type: 'hitter' },
+        { id: 665742, name: 'Juan Soto', team: 'NYY', pos: 'RF', type: 'hitter' }, { id: 547180, name: 'Bryce Harper', team: 'PHI', pos: '1B', type: 'hitter' },
+        { id: 694973, name: 'Paul Skenes', team: 'PIT', pos: 'SP', type: 'pitcher' }, { id: 594798, name: 'Gerrit Cole', team: 'NYY', pos: 'SP', type: 'pitcher' },
+        { id: 669373, name: 'Tarik Skubal', team: 'DET', pos: 'SP', type: 'pitcher' }, { id: 605483, name: 'Corbin Burnes', team: 'BAL', pos: 'SP', type: 'pitcher' },
         { id: 608566, name: 'Tyler Glasnow', team: 'LAD', pos: 'SP', type: 'pitcher' },
       ];
     }
   }
 }
 
-// -- Render Functions --
+function headshot(playerId) { if (!playerId) return ''; return `<img src="https://img.mlb.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current" alt="" onerror="this.style.display='none';this.parentNode.textContent=this.parentNode.dataset.fallback||''">`; }
+function eraClass(era) { const e = parseFloat(era); if (isNaN(e)) return ''; if (e <= 2.50) return 'era-elite'; if (e <= 3.50) return 'era-good'; if (e <= 4.50) return 'era-avg'; return 'era-bad'; }
 
-function headshot(playerId) {
-  if (!playerId) return '';
-  return `<img src="https://img.mlb.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${playerId}/headshot/67/current" alt="" onerror="this.style.display='none';this.parentNode.textContent=this.parentNode.dataset.fallback||''">`;
-}
-
-function eraClass(era) {
-  const e = parseFloat(era);
-  if (isNaN(e)) return '';
-  if (e <= 2.50) return 'era-elite';
-  if (e <= 3.50) return 'era-good';
-  if (e <= 4.50) return 'era-avg';
-  return 'era-bad';
-}
-
-// -- Stream Mode --
 let streamMode = false;
 function toggleStreamMode() {
   streamMode = !streamMode;
   document.body.classList.toggle('stream-mode', streamMode);
   const btn = document.getElementById('streamModeBtn');
-  if (streamMode) {
-    btn.textContent = 'Exit Stream';
-    setTimeout(() => { document.getElementById('controlPanel').style.display = 'none'; }, 100);
-    document.addEventListener('keydown', streamModeEsc);
-  } else {
-    document.getElementById('controlPanel').style.display = '';
-    btn.textContent = 'Stream Mode';
-    document.removeEventListener('keydown', streamModeEsc);
-  }
+  if (streamMode) { btn.textContent = 'Exit Stream'; setTimeout(() => { document.getElementById('controlPanel').style.display = 'none'; }, 100); document.addEventListener('keydown', streamModeEsc); }
+  else { document.getElementById('controlPanel').style.display = ''; btn.textContent = 'Stream Mode'; document.removeEventListener('keydown', streamModeEsc); }
 }
-function streamModeEsc(e) { if (e.key === 'Escape') { toggleStreamMode(); } }
+function streamModeEsc(e) { if (e.key === 'Escape') toggleStreamMode(); }
 
-// -- Auto-Rotate Spotlight --
 let autoRotateInterval = null;
 let autoRotateIdx = 0;
 function toggleAutoRotate() {
   const btn = document.getElementById('autoRotateBtn');
-  if (autoRotateInterval) {
-    clearInterval(autoRotateInterval);
-    autoRotateInterval = null;
-    btn.classList.remove('active');
-    btn.textContent = 'Auto-Rotate';
-  } else {
-    btn.classList.add('active');
-    btn.textContent = 'Stop Rotate';
-    rotateSpotlight();
-    autoRotateInterval = setInterval(rotateSpotlight, 8000);
-  }
+  if (autoRotateInterval) { clearInterval(autoRotateInterval); autoRotateInterval = null; btn.classList.remove('active'); btn.textContent = 'Auto-Rotate'; }
+  else { btn.classList.add('active'); btn.textContent = 'Stop Rotate'; rotateSpotlight(); autoRotateInterval = setInterval(rotateSpotlight, 8000); }
 }
-function rotateSpotlight() {
-  const liveGames = state.games.filter(g => g.statusClass === 'live');
-  if (!liveGames.length) return;
-  autoRotateIdx = autoRotateIdx % liveGames.length;
-  spotlightGamePk = liveGames[autoRotateIdx].gamePk;
-  autoRotateIdx++;
-  renderSidebar(state.games);
-  renderMain();
-}
+function rotateSpotlight() { const liveGames = state.games.filter(g => g.statusClass === 'live'); if (!liveGames.length) return; autoRotateIdx = autoRotateIdx % liveGames.length; spotlightGamePk = liveGames[autoRotateIdx].gamePk; autoRotateIdx++; renderSidebar(state.games); renderMain(); }
 
-// -- localStorage save/load --
 const SAVE_KEY = 'diamond_breakdown_state';
-function saveState() {
-  try {
-    const toSave = {
-      pitcherOfDay: state.pitcherOfDay,
-      hitterOfDay: state.hitterOfDay,
-      theCall: state.theCall,
-      statOfDay: state.statOfDay,
-      hotPlayers: state.hotPlayers,
-      coldPlayers: state.coldPlayers
-    };
-    localStorage.setItem(SAVE_KEY, JSON.stringify(toSave));
-  } catch(e) {}
-}
-function loadSavedState() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return false;
-    const saved = JSON.parse(raw);
-    if (saved.pitcherOfDay) state.pitcherOfDay = saved.pitcherOfDay;
-    if (saved.hitterOfDay) state.hitterOfDay = saved.hitterOfDay;
-    if (saved.theCall) state.theCall = saved.theCall;
-    if (saved.statOfDay) state.statOfDay = saved.statOfDay;
-    if (saved.hotPlayers && saved.hotPlayers.length) state.hotPlayers = saved.hotPlayers;
-    if (saved.coldPlayers && saved.coldPlayers.length) state.coldPlayers = saved.coldPlayers;
-    return true;
-  } catch(e) { return false; }
-}
+function saveState() { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ pitcherOfDay: state.pitcherOfDay, hitterOfDay: state.hitterOfDay, theCall: state.theCall, statOfDay: state.statOfDay, hotPlayers: state.hotPlayers, coldPlayers: state.coldPlayers })); } catch(e) {} }
+function loadSavedState() { try { const raw = localStorage.getItem(SAVE_KEY); if (!raw) return false; const saved = JSON.parse(raw); if (saved.pitcherOfDay) state.pitcherOfDay = saved.pitcherOfDay; if (saved.hitterOfDay) state.hitterOfDay = saved.hitterOfDay; if (saved.theCall) state.theCall = saved.theCall; if (saved.statOfDay) state.statOfDay = saved.statOfDay; if (saved.hotPlayers && saved.hotPlayers.length) state.hotPlayers = saved.hotPlayers; if (saved.coldPlayers && saved.coldPlayers.length) state.coldPlayers = saved.coldPlayers; return true; } catch(e) { return false; } }
 
-// -- HR Alert Detection --
 let previousHRKeys = new Set();
-function detectNewHomers() {
-  const currentKeys = new Set(state.latestHomers.map(hr => hr.batter + hr.startTime));
-  const hasNew = [...currentKeys].some(k => !previousHRKeys.has(k)) && previousHRKeys.size > 0;
-  previousHRKeys = currentKeys;
-  return hasNew;
-}
+function detectNewHomers() { const currentKeys = new Set(state.latestHomers.map(hr => hr.batter + hr.startTime)); const hasNew = [...currentKeys].some(k => !previousHRKeys.has(k)) && previousHRKeys.size > 0; previousHRKeys = currentKeys; return hasNew; }
 
-// -- Spotlight Line Score Fetch --
 let spotlightLineScore = null;
 let spotlightPlays = [];
 async function fetchSpotlightData(gamePk) {
   if (!useAPI || !gamePk) { spotlightLineScore = null; spotlightPlays = []; return; }
-  try {
-    const r = await fetch(`${MLB_API}/game/${gamePk}/linescore`);
-    if (r.ok) {
-      const d = await r.json();
-      spotlightLineScore = d;
-    }
-  } catch(e) { spotlightLineScore = null; }
-  try {
-    const r = await fetch(`${MLB_API}/game/${gamePk}/playByPlay`);
-    if (r.ok) {
-      const d = await r.json();
-      if (d.allPlays) {
-        spotlightPlays = d.allPlays.filter(p => p.result && p.result.description).slice(-8).reverse();
-      }
-    }
-  } catch(e) { spotlightPlays = []; }
+  try { const r = await fetch(`${MLB_API}/game/${gamePk}/linescore`); if (r.ok) spotlightLineScore = await r.json(); } catch(e) { spotlightLineScore = null; }
+  try { const r = await fetch(`${MLB_API}/game/${gamePk}/playByPlay`); if (r.ok) { const d = await r.json(); if (d.allPlays) spotlightPlays = d.allPlays.filter(p => p.result && p.result.description).slice(-8).reverse(); } } catch(e) { spotlightPlays = []; }
 }
 
 function renderRunners(runners, size) {
-  const s = size || 28;
-  const ds = Math.round(s * 0.24);
-  const spread = Math.round(s * 0.27);
-  const cx = s / 2;
-  const cy = s / 2;
-  const onColor = '#22c55e';
-  const offColor = 'rgba(255,255,255,0.08)';
-  const stroke = 'rgba(255,255,255,0.15)';
-  const bases = [
-    { x: cx, y: cy - spread, on: runners.second },
-    { x: cx + spread, y: cy, on: runners.first },
-    { x: cx - spread, y: cy, on: runners.third },
-  ];
-  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" style="display:block">
-    ${bases.map(b => `<rect x="${b.x - ds/2}" y="${b.y - ds/2}" width="${ds}" height="${ds}" rx="1"
-      transform="rotate(45 ${b.x} ${b.y})"
-      fill="${b.on ? onColor : offColor}" stroke="${stroke}" stroke-width="0.5"/>`).join('')}
-  </svg>`;
+  const s = size || 28; const ds = Math.round(s * 0.24); const spread = Math.round(s * 0.27); const cx = s / 2; const cy = s / 2;
+  const bases = [ { x: cx, y: cy - spread, on: runners.second }, { x: cx + spread, y: cy, on: runners.first }, { x: cx - spread, y: cy, on: runners.third } ];
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" style="display:block">${bases.map(b => `<rect x="${b.x - ds/2}" y="${b.y - ds/2}" width="${ds}" height="${ds}" rx="1" transform="rotate(45 ${b.x} ${b.y})" fill="${b.on ? '#22c55e' : 'rgba(255,255,255,0.08)'}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>`).join('')}</svg>`;
 }
 
-function shortenPitcher(name) {
-  if (!name) return '';
-  const parts = name.split(', ');
-  if (parts.length === 2) return parts[0];
-  const space = name.lastIndexOf(' ');
-  if (space > 0) return name.substring(space + 1);
-  return name;
-}
+function shortenPitcher(name) { if (!name) return ''; const parts = name.split(', '); if (parts.length === 2) return parts[0]; const space = name.lastIndexOf(' '); if (space > 0) return name.substring(space + 1); return name; }
 
 function renderSidebar(games) {
   const sidebar = document.getElementById('sidebar');
-  let html = `<div class="sidebar-header">
-    <span>All Games</span>
-    <span class="game-count">${games.length}</span>
-  </div>`;
-
-  const sorted = [...games].sort((a,b) => {
-    const order = { live: 0, final: 1, pre: 2 };
-    return (order[a.statusClass] ?? 2) - (order[b.statusClass] ?? 2);
-  });
-
+  let html = `<div class="sidebar-header"><span>All Games</span><span class="game-count">${games.length}</span></div>`;
+  const sorted = [...games].sort((a,b) => { const order = { live: 0, final: 1, pre: 2 }; return (order[a.statusClass] ?? 2) - (order[b.statusClass] ?? 2); });
   for (const g of sorted) {
     const isActive = g.gamePk === spotlightGamePk;
     const awayWin = g.statusClass === 'final' && g.away.score > g.home.score;
     const homeWin = g.statusClass === 'final' && g.home.score > g.away.score;
     const isLive = g.statusClass === 'live';
-    const awayP = shortenPitcher(g.awayPitcher);
-    const homeP = shortenPitcher(g.homePitcher);
+    const awayP = shortenPitcher(g.awayPitcher); const homeP = shortenPitcher(g.homePitcher);
     const awayEra = g.awayPitcherEra ? `<span class="${eraClass(g.awayPitcherEra)}" style="font-size:10px;font-weight:700"> ${g.awayPitcherEra}</span>` : '';
     const homeEra = g.homePitcherEra ? `<span class="${eraClass(g.homePitcherEra)}" style="font-size:10px;font-weight:700"> ${g.homePitcherEra}</span>` : '';
     const pitcherLine = (awayP || homeP) ? `${awayP}${awayEra} vs ${homeP}${homeEra}` : '';
-
     html += `<div class="game-card ${isActive ? 'active' : ''}" onclick="setSpotlight(${g.gamePk})">
-      <div class="game-status ${g.statusClass}">
-        ${isLive ? '<span class="live-dot"></span>' : ''}
-        ${g.status}
-        ${isLive ? ` · ${g.outs} out` : ''}
-      </div>
+      <div class="game-status ${g.statusClass}">${isLive ? '<span class="live-dot"></span>' : ''} ${g.status} ${isLive ? ` · ${g.outs} out` : ''}</div>
       <div class="game-teams">
-        <div class="game-team-row">
-          <div class="team-info">
-            <span class="team-abbr">${g.away.abbr}</span>
-            <span class="team-record">${g.away.record}</span>
-          </div>
-          <span class="team-score ${awayWin ? 'winner' : ''}">${g.away.score}</span>
-        </div>
-        <div class="game-team-row">
-          <div class="team-info">
-            <span class="team-abbr">${g.home.abbr}</span>
-            <span class="team-record">${g.home.record}</span>
-          </div>
-          <span class="team-score ${homeWin ? 'winner' : ''}">${g.home.score}</span>
-        </div>
+        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.away.abbr}</span><span class="team-record">${g.away.record}</span></div><span class="team-score ${awayWin ? 'winner' : ''}">${g.away.score}</span></div>
+        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.home.abbr}</span><span class="team-record">${g.home.record}</span></div><span class="team-score ${homeWin ? 'winner' : ''}">${g.home.score}</span></div>
       </div>
-      <div class="game-meta">
-        <span class="game-pitchers">${pitcherLine}</span>
-        ${isLive ? `<div class="game-runners-wrap">${renderRunners(g.runners, 26)}</div>` : ''}
-      </div>
+      <div class="game-meta"><span class="game-pitchers">${pitcherLine}</span>${isLive ? `<div class="game-runners-wrap">${renderRunners(g.runners, 26)}</div>` : ''}</div>
     </div>`;
   }
   sidebar.innerHTML = html;
 }
 
 function renderMain() {
-  const p = state.pitcherOfDay;
-  const h = state.hitterOfDay;
-  const main = document.getElementById('mainContent');
-
+  const p = state.pitcherOfDay; const h = state.hitterOfDay; const main = document.getElementById('mainContent');
   let spotlightHtml = '';
   if (spotlightGamePk) {
     const g = state.games.find(gm => gm.gamePk === spotlightGamePk);
@@ -1544,452 +711,123 @@ function renderMain() {
       let lineScoreHtml = '';
       if (spotlightLineScore && spotlightLineScore.innings && spotlightLineScore.innings.length) {
         const innings = spotlightLineScore.innings;
-        const maxInn = innings.length;
-        lineScoreHtml = `<table class="linescore-table">
-          <thead><tr><th></th>${innings.map(inn => `<th>${inn.num}</th>`).join('')}<th style="border-left:1px solid rgba(255,255,255,0.1)">R</th><th>H</th><th>E</th></tr></thead>
-          <tbody>
-            <tr><td class="team-col">${g.away.abbr}</td>${innings.map(inn => `<td>${inn.away && inn.away.runs != null ? inn.away.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.runs : g.away.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.errors : '-'}</td></tr>
-            <tr><td class="team-col">${g.home.abbr}</td>${innings.map(inn => `<td>${inn.home && inn.home.runs != null ? inn.home.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.runs : g.home.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.errors : '-'}</td></tr>
-          </tbody>
-        </table>`;
+        lineScoreHtml = `<table class="linescore-table"><thead><tr><th></th>${innings.map(inn => `<th>${inn.num}</th>`).join('')}<th style="border-left:1px solid rgba(255,255,255,0.1)">R</th><th>H</th><th>E</th></tr></thead><tbody>
+          <tr><td class="team-col">${g.away.abbr}</td>${innings.map(inn => `<td>${inn.away && inn.away.runs != null ? inn.away.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.runs : g.away.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.away ? spotlightLineScore.teams.away.errors : '-'}</td></tr>
+          <tr><td class="team-col">${g.home.abbr}</td>${innings.map(inn => `<td>${inn.home && inn.home.runs != null ? inn.home.runs : ''}</td>`).join('')}<td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.runs : g.home.score}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.hits : '-'}</td><td class="rhe">${spotlightLineScore.teams && spotlightLineScore.teams.home ? spotlightLineScore.teams.home.errors : '-'}</td></tr>
+        </tbody></table>`;
       }
       let playsHtml = '';
-      if (spotlightPlays.length) {
-        playsHtml = `<div class="play-feed">${spotlightPlays.map(play => {
-          const isScoring = play.result.event === 'Home Run' || (play.result.rbi && play.result.rbi > 0);
-          const inn = play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : '';
-          return `<div class="play-item ${isScoring ? 'scoring' : ''}"><span class="play-inning">${inn}</span>${play.result.description}</div>`;
-        }).join('')}</div>`;
-      }
-      spotlightHtml = `<div class="card spotlight-card">
-        <div class="card-header">
-          <span class="card-label">Game Spotlight${autoRotateInterval ? '<span class="auto-rotate-badge"><span class="live-dot"></span>Auto</span>' : ''}</span>
-          <span class="card-badge green">${g.status}</span>
-        </div>
-        <div class="card-body">
-          <div class="spotlight-matchup">
-            <div class="spotlight-team">
-              <div class="spotlight-team-name">${g.away.name}</div>
-              <div class="spotlight-team-record">${g.away.record}</div>
-            </div>
-            <div class="spotlight-score">${g.away.score} - ${g.home.score}</div>
-            <div class="spotlight-team">
-              <div class="spotlight-team-name">${g.home.name}</div>
-              <div class="spotlight-team-record">${g.home.record}</div>
-            </div>
-          </div>
-          <div class="spotlight-detail">
-            <div class="spotlight-detail-item">
-              <div class="spotlight-detail-label">Inning</div>
-              <div class="spotlight-detail-value">${g.status}</div>
-            </div>
-            <div class="spotlight-detail-item">
-              <div class="spotlight-detail-label">Outs</div>
-              <div class="spotlight-detail-value">${g.outs}</div>
-            </div>
-            <div class="spotlight-detail-item">
-              <div class="spotlight-detail-label">Bases</div>
-              <div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div>
-            </div>
-          </div>
-          ${lineScoreHtml}
-          ${playsHtml}
-        </div>
-      </div>`;
+      if (spotlightPlays.length) { playsHtml = `<div class="play-feed">${spotlightPlays.map(play => { const isScoring = play.result.event === 'Home Run' || (play.result.rbi && play.result.rbi > 0); const inn = play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : ''; return `<div class="play-item ${isScoring ? 'scoring' : ''}"><span class="play-inning">${inn}</span>${play.result.description}</div>`; }).join('')}</div>`; }
+      spotlightHtml = `<div class="card spotlight-card"><div class="card-header"><span class="card-label">Game Spotlight${autoRotateInterval ? '<span class="auto-rotate-badge"><span class="live-dot"></span>Auto</span>' : ''}</span><span class="card-badge green">${g.status}</span></div><div class="card-body">
+        <div class="spotlight-matchup"><div class="spotlight-team"><div class="spotlight-team-name">${g.away.name}</div><div class="spotlight-team-record">${g.away.record}</div></div><div class="spotlight-score">${g.away.score} - ${g.home.score}</div><div class="spotlight-team"><div class="spotlight-team-name">${g.home.name}</div><div class="spotlight-team-record">${g.home.record}</div></div></div>
+        <div class="spotlight-detail"><div class="spotlight-detail-item"><div class="spotlight-detail-label">Inning</div><div class="spotlight-detail-value">${g.status}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Outs</div><div class="spotlight-detail-value">${g.outs}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Bases</div><div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div></div></div>
+        ${lineScoreHtml}${playsHtml}</div></div>`;
     }
   }
 
-  const pitcherHtml = p ? `<div class="card player-card">
-    <div class="card-header">
-      <span class="card-label">Pitcher of the Day</span>
-      <span class="card-badge green">SP</span>
-    </div>
-    <div class="card-body">
-      <div class="player-hero">
-        <div class="player-avatar" data-fallback="${p.number}">${p.playerId ? headshot(p.playerId) : p.number}</div>
-        <div class="player-info">
-          <div class="player-name">${p.name}</div>
-          <div class="player-team">${p.team}</div>
-          <div class="player-position">${p.position}</div>
-        </div>
-      </div>
-      <div class="stat-period">Season</div>
-      <div class="stat-row pitcher-stats">
-        <div class="stat-row-header"><span>W-L</span><span>ERA</span><span>IP</span><span>K</span><span>WHIP</span><span>AVG</span></div>
-        <div class="stat-row-values"><span>${p.season.w}-${p.season.l}</span><span class="stat-highlight">${p.season.era}</span><span>${p.season.ip}</span><span class="stat-highlight">${p.season.k}</span><span>${p.season.whip}</span><span>${p.season.avg}</span></div>
-      </div>
-      <div class="stat-period">Last 7 Days</div>
-      <div class="stat-row pitcher-stats">
-        <div class="stat-row-header"><span>W-L</span><span>ERA</span><span>IP</span><span>K</span><span>WHIP</span><span>AVG</span></div>
-        <div class="stat-row-values"><span>${p.last7.w}-${p.last7.l}</span><span class="stat-highlight">${p.last7.era}</span><span>${p.last7.ip}</span><span class="stat-highlight">${p.last7.k}</span><span>${p.last7.whip}</span><span>${p.last7.avg}</span></div>
-      </div>
-      ${p.tonight ? `<div class="stat-period">Tonight</div>
-      <div class="stat-row pitcher-stats">
-        <div class="stat-row-header"><span>IP</span><span>H</span><span>R</span><span>ER</span><span>K</span><span>BB</span></div>
-        <div class="stat-row-values"><span>${p.tonight.ip}</span><span>${p.tonight.h}</span><span>${p.tonight.r}</span><span>${p.tonight.er}</span><span class="stat-highlight">${p.tonight.k}</span><span>${p.tonight.bb}</span></div>
-      </div>` : ''}
-    </div>
-  </div>` : '';
+  const pitcherHtml = p ? `<div class="card player-card"><div class="card-header"><span class="card-label">Pitcher of the Day</span><span class="card-badge green">SP</span></div><div class="card-body">
+    <div class="player-hero"><div class="player-avatar" data-fallback="${p.number}">${p.playerId ? headshot(p.playerId) : p.number}</div><div class="player-info"><div class="player-name">${p.name}</div><div class="player-team">${p.team}</div><div class="player-position">${p.position}</div></div></div>
+    <div class="stat-period">Season</div><div class="stat-row pitcher-stats"><div class="stat-row-header"><span>W-L</span><span>ERA</span><span>IP</span><span>K</span><span>WHIP</span><span>AVG</span></div><div class="stat-row-values"><span>${p.season.w}-${p.season.l}</span><span class="stat-highlight">${p.season.era}</span><span>${p.season.ip}</span><span class="stat-highlight">${p.season.k}</span><span>${p.season.whip}</span><span>${p.season.avg}</span></div></div>
+    <div class="stat-period">Last 7 Days</div><div class="stat-row pitcher-stats"><div class="stat-row-header"><span>W-L</span><span>ERA</span><span>IP</span><span>K</span><span>WHIP</span><span>AVG</span></div><div class="stat-row-values"><span>${p.last7.w}-${p.last7.l}</span><span class="stat-highlight">${p.last7.era}</span><span>${p.last7.ip}</span><span class="stat-highlight">${p.last7.k}</span><span>${p.last7.whip}</span><span>${p.last7.avg}</span></div></div>
+    ${p.tonight ? `<div class="stat-period">Tonight</div><div class="stat-row pitcher-stats"><div class="stat-row-header"><span>IP</span><span>H</span><span>R</span><span>ER</span><span>K</span><span>BB</span></div><div class="stat-row-values"><span>${p.tonight.ip}</span><span>${p.tonight.h}</span><span>${p.tonight.r}</span><span>${p.tonight.er}</span><span class="stat-highlight">${p.tonight.k}</span><span>${p.tonight.bb}</span></div></div>` : ''}
+  </div></div>` : '';
 
-  const hitterHtml = h ? `<div class="card player-card">
-    <div class="card-header">
-      <span class="card-label">Hitter of the Day</span>
-      <span class="card-badge red">DH</span>
-    </div>
-    <div class="card-body">
-      <div class="player-hero">
-        <div class="player-avatar" data-fallback="${h.number}">${h.playerId ? headshot(h.playerId) : h.number}</div>
-        <div class="player-info">
-          <div class="player-name">${h.name}</div>
-          <div class="player-team">${h.team}</div>
-          <div class="player-position">${h.position}</div>
-        </div>
-      </div>
-      <div class="stat-period">Season</div>
-      <div class="stat-row hitter-stats">
-        <div class="stat-row-header"><span>AVG</span><span>HR</span><span>RBI</span><span>OPS</span><span>SB</span><span>wOBA</span></div>
-        <div class="stat-row-values"><span class="stat-highlight">${h.season.avg}</span><span>${h.season.hr}</span><span>${h.season.rbi}</span><span class="stat-highlight">${h.season.ops}</span><span>${h.season.sb}</span><span>${h.season.woba}</span></div>
-      </div>
-      <div class="stat-period">Last 7 Days</div>
-      <div class="stat-row hitter-stats">
-        <div class="stat-row-header"><span>AVG</span><span>HR</span><span>RBI</span><span>OPS</span><span>SB</span><span>wOBA</span></div>
-        <div class="stat-row-values"><span class="stat-highlight">${h.last7.avg}</span><span>${h.last7.hr}</span><span>${h.last7.rbi}</span><span class="stat-highlight">${h.last7.ops}</span><span>${h.last7.sb}</span><span>${h.last7.woba}</span></div>
-      </div>
-      ${h.tonight ? `<div class="stat-period">Tonight</div>
-      <div class="stat-row hitter-stats">
-        <div class="stat-row-header"><span>AB</span><span>H</span><span>HR</span><span>RBI</span><span>BB</span><span>K</span></div>
-        <div class="stat-row-values"><span>${h.tonight.ab}</span><span>${h.tonight.h}</span><span class="stat-highlight">${h.tonight.hr}</span><span>${h.tonight.rbi}</span><span>${h.tonight.bb}</span><span>${h.tonight.k}</span></div>
-      </div>` : ''}
-    </div>
-  </div>` : '';
+  const hitterHtml = h ? `<div class="card player-card"><div class="card-header"><span class="card-label">Hitter of the Day</span><span class="card-badge red">DH</span></div><div class="card-body">
+    <div class="player-hero"><div class="player-avatar" data-fallback="${h.number}">${h.playerId ? headshot(h.playerId) : h.number}</div><div class="player-info"><div class="player-name">${h.name}</div><div class="player-team">${h.team}</div><div class="player-position">${h.position}</div></div></div>
+    <div class="stat-period">Season</div><div class="stat-row hitter-stats"><div class="stat-row-header"><span>AVG</span><span>HR</span><span>RBI</span><span>OPS</span><span>SB</span><span>wOBA</span></div><div class="stat-row-values"><span class="stat-highlight">${h.season.avg}</span><span>${h.season.hr}</span><span>${h.season.rbi}</span><span class="stat-highlight">${h.season.ops}</span><span>${h.season.sb}</span><span>${h.season.woba}</span></div></div>
+    <div class="stat-period">Last 7 Days</div><div class="stat-row hitter-stats"><div class="stat-row-header"><span>AVG</span><span>HR</span><span>RBI</span><span>OPS</span><span>SB</span><span>wOBA</span></div><div class="stat-row-values"><span class="stat-highlight">${h.last7.avg}</span><span>${h.last7.hr}</span><span>${h.last7.rbi}</span><span class="stat-highlight">${h.last7.ops}</span><span>${h.last7.sb}</span><span>${h.last7.woba}</span></div></div>
+    ${h.tonight ? `<div class="stat-period">Tonight</div><div class="stat-row hitter-stats"><div class="stat-row-header"><span>AB</span><span>H</span><span>HR</span><span>RBI</span><span>BB</span><span>K</span></div><div class="stat-row-values"><span>${h.tonight.ab}</span><span>${h.tonight.h}</span><span class="stat-highlight">${h.tonight.hr}</span><span>${h.tonight.rbi}</span><span>${h.tonight.bb}</span><span>${h.tonight.k}</span></div></div>` : ''}
+  </div></div>` : '';
 
-  const hotColdHtml = `<div class="card hotcold-card">
-    <div class="card-header">
-      <span class="card-label">Who's Hot & Cold</span>
-      <span class="card-badge green">Last 7 Games OPS</span>
-    </div>
-    <div class="card-body">
-      <div class="hotcold-grid">
-        <div>
-          <div class="hotcold-section-title hot">&#x1F525; On Fire</div>
-          ${state.hotPlayers.map((p, i) => `<div class="hotcold-player hot-row">
-            <div style="display:flex;align-items:center;gap:6px;min-width:0">
-              <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
-              <span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
-              <span class="hotcold-player-team">${p.team}</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span>
-              <span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span>
-              <span class="hotcold-stat hot" style="min-width:42px;text-align:right">${p.ops}</span>
-            </div>
-          </div>`).join('')}
-        </div>
-        <div>
-          <div class="hotcold-section-title cold">&#x1F976; Ice Cold</div>
-          ${state.coldPlayers.map((p, i) => `<div class="hotcold-player cold-row">
-            <div style="display:flex;align-items:center;gap:6px;min-width:0">
-              <span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span>
-              <span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
-              <span class="hotcold-player-team">${p.team}</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span>
-              <span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span>
-              <span class="hotcold-stat cold" style="min-width:42px;text-align:right">${p.ops}</span>
-            </div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-  </div>`;
+  const hotColdHtml = `<div class="card hotcold-card"><div class="card-header"><span class="card-label">Who's Hot & Cold</span><span class="card-badge green">Last 7 Games OPS</span></div><div class="card-body"><div class="hotcold-grid"><div>
+    <div class="hotcold-section-title hot">&#x1F525; On Fire</div>
+    ${state.hotPlayers.map((p, i) => `<div class="hotcold-player hot-row"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span><span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span><span class="hotcold-player-team">${p.team}</span></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span><span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span><span class="hotcold-stat hot" style="min-width:42px;text-align:right">${p.ops}</span></div></div>`).join('')}
+  </div><div>
+    <div class="hotcold-section-title cold">&#x1F976; Ice Cold</div>
+    ${state.coldPlayers.map((p, i) => `<div class="hotcold-player cold-row"><div style="display:flex;align-items:center;gap:6px;min-width:0"><span style="font-size:11px;color:var(--white-dim);min-width:14px">${i+1}.</span><span class="hotcold-player-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span><span class="hotcold-player-team">${p.team}</span></div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><span style="font-size:11px;color:var(--white-muted)">${p.avg || '-'}</span><span style="font-size:11px;color:var(--white-muted)">${p.hr || '-'} HR</span><span class="hotcold-stat cold" style="min-width:42px;text-align:right">${p.ops}</span></div></div>`).join('')}
+  </div></div></div></div>`;
 
   const callStatusClass = state.theCall.status;
   let callBodyHtml;
-  if (editingCall) {
-    callBodyHtml = `<div class="inline-edit-form">
-      <textarea id="callEditInput" rows="2">${state.theCall.text}</textarea>
-      <div class="inline-edit-actions">
-        <button onclick="cancelCallEdit()">Cancel</button>
-        <button class="save-btn" onclick="saveTheCall()">Save</button>
-      </div>
-    </div>`;
-  } else {
-    callBodyHtml = `<div class="call-prediction" id="callText" ondblclick="editTheCall()">${state.theCall.text}</div>
-      <div class="call-status">
-        <button class="call-btn ${callStatusClass === 'pending' ? 'pending' : ''}" onclick="setCallStatus('pending')">Pending</button>
-        <button class="call-btn ${callStatusClass === 'hit' ? 'hit' : ''}" onclick="setCallStatus('hit')">Hit</button>
-        <button class="call-btn ${callStatusClass === 'miss' ? 'miss' : ''}" onclick="setCallStatus('miss')">Miss</button>
-      </div>`;
-  }
-  const callHtml = `<div class="card call-card">
-    <div class="card-header">
-      <span class="card-label">The Call</span>
-      <span class="card-badge ${callStatusClass === 'hit' ? 'green' : callStatusClass === 'miss' ? 'red' : 'green'}">${callStatusClass === 'hit' ? 'HIT' : callStatusClass === 'miss' ? 'MISS' : 'PENDING'}</span>
-    </div>
-    <div class="card-body">${callBodyHtml}</div>
-  </div>`;
+  if (editingCall) { callBodyHtml = `<div class="inline-edit-form"><textarea id="callEditInput" rows="2">${state.theCall.text}</textarea><div class="inline-edit-actions"><button onclick="cancelCallEdit()">Cancel</button><button class="save-btn" onclick="saveTheCall()">Save</button></div></div>`; }
+  else { callBodyHtml = `<div class="call-prediction" id="callText" ondblclick="editTheCall()">${state.theCall.text}</div><div class="call-status"><button class="call-btn ${callStatusClass === 'pending' ? 'pending' : ''}" onclick="setCallStatus('pending')">Pending</button><button class="call-btn ${callStatusClass === 'hit' ? 'hit' : ''}" onclick="setCallStatus('hit')">Hit</button><button class="call-btn ${callStatusClass === 'miss' ? 'miss' : ''}" onclick="setCallStatus('miss')">Miss</button></div>`; }
+  const callHtml = `<div class="card call-card"><div class="card-header"><span class="card-label">The Call</span><span class="card-badge ${callStatusClass === 'hit' ? 'green' : callStatusClass === 'miss' ? 'red' : 'green'}">${callStatusClass === 'hit' ? 'HIT' : callStatusClass === 'miss' ? 'MISS' : 'PENDING'}</span></div><div class="card-body">${callBodyHtml}</div></div>`;
 
   let statBodyHtml;
-  if (editingStat) {
-    statBodyHtml = `<div class="inline-edit-form">
-      <div style="display:flex;gap:8px">
-        <input id="statEditNumber" placeholder="Number" value="${state.statOfDay.number}" style="flex:2"/>
-        <input id="statEditUnit" placeholder="Unit" value="${state.statOfDay.unit}" style="flex:1"/>
-      </div>
-      <textarea id="statEditDesc" rows="2" placeholder="Description">${state.statOfDay.desc}</textarea>
-      <div class="inline-edit-actions">
-        <button onclick="cancelStatEdit()">Cancel</button>
-        <button class="save-btn" onclick="saveStatOfDay()">Save</button>
-      </div>
-    </div>`;
-  } else {
-    statBodyHtml = `<div class="stat-featured" ondblclick="editStatOfDay()">
-        <div class="stat-big-number" id="statNumber">${state.statOfDay.number}<span style="font-size:20px;margin-left:4px;color:var(--white-muted)">${state.statOfDay.unit || ''}</span></div>
-        <div class="stat-description" id="statDesc">${state.statOfDay.desc}</div>
-      </div>`;
-  }
-  const statHtml = `<div class="card stat-card">
-    <div class="card-header">
-      <span class="card-label">Stat of the Day</span>
-    </div>
-    <div class="card-body">${statBodyHtml}</div>
-  </div>`;
+  if (editingStat) { statBodyHtml = `<div class="inline-edit-form"><div style="display:flex;gap:8px"><input id="statEditNumber" placeholder="Number" value="${state.statOfDay.number}" style="flex:2"/><input id="statEditUnit" placeholder="Unit" value="${state.statOfDay.unit}" style="flex:1"/></div><textarea id="statEditDesc" rows="2" placeholder="Description">${state.statOfDay.desc}</textarea><div class="inline-edit-actions"><button onclick="cancelStatEdit()">Cancel</button><button class="save-btn" onclick="saveStatOfDay()">Save</button></div></div>`; }
+  else { statBodyHtml = `<div class="stat-featured" ondblclick="editStatOfDay()"><div class="stat-big-number" id="statNumber">${state.statOfDay.number}<span style="font-size:20px;margin-left:4px;color:var(--white-muted)">${state.statOfDay.unit || ''}</span></div><div class="stat-description" id="statDesc">${state.statOfDay.desc}</div></div>`; }
+  const statHtml = `<div class="card stat-card"><div class="card-header"><span class="card-label">Stat of the Day</span></div><div class="card-body">${statBodyHtml}</div></div>`;
 
   const newHR = detectNewHomers();
-  const homersHtml = state.latestHomers.length ? `<div class="card hotcold-card${newHR ? ' hr-new' : ''}">
-    <div class="card-header">
-      <span class="card-label">Latest Homers</span>
-      <span class="card-badge red">${state.latestHomers.length} HR</span>
-    </div>
-    <div class="card-body">
-      ${state.latestHomers.map((hr, i) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:rgba(196,36,58,0.08)">
-        <div style="display:flex;align-items:center;gap:10px;min-width:0">
-          <span style="font-size:18px;width:24px;text-align:center;flex-shrink:0">💣</span>
-          <div style="min-width:0">
-            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${hr.batter}</div>
-            <div style="font-size:10px;color:var(--white-dim)">${hr.matchup || ''}${hr.inning ? ' · ' + hr.inning : ''}</div>
-          </div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:10px">
-          ${hr.distance ? `<div style="font-weight:800;font-size:16px;color:var(--red-light);font-variant-numeric:tabular-nums">${hr.distance} ft</div>` : ''}
-          ${hr.exitVelo ? `<div style="font-size:10px;color:var(--white-dim)">${hr.exitVelo} mph EV</div>` : ''}
-        </div>
-      </div>`).join('')}
-    </div>
-  </div>` : '';
+  const homersHtml = state.latestHomers.length ? `<div class="card hotcold-card${newHR ? ' hr-new' : ''}"><div class="card-header"><span class="card-label">Latest Homers</span><span class="card-badge red">${state.latestHomers.length} HR</span></div><div class="card-body">
+    ${state.latestHomers.map(hr => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:6px;margin-bottom:4px;background:rgba(196,36,58,0.08)">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="font-size:18px;width:24px;text-align:center;flex-shrink:0">\u{1F4A3}</span><div style="min-width:0"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${hr.batter}</div><div style="font-size:10px;color:var(--white-dim)">${hr.matchup || ''}${hr.inning ? ' · ' + hr.inning : ''}</div></div></div>
+      <div style="text-align:right;flex-shrink:0;margin-left:10px">${hr.distance ? `<div style="font-weight:800;font-size:16px;color:var(--red-light);font-variant-numeric:tabular-nums">${hr.distance} ft</div>` : ''}${hr.exitVelo ? `<div style="font-size:10px;color:var(--white-dim)">${hr.exitVelo} mph EV</div>` : ''}</div>
+    </div>`).join('')}</div></div>` : '';
 
-  main.innerHTML = `<div class="main-grid">
-    ${spotlightHtml}
-    ${pitcherHtml}
-    ${hitterHtml}
-    ${hotColdHtml}
-    ${homersHtml}
-    ${callHtml}
-    ${statHtml}
-  </div>`;
+  main.innerHTML = `<div class="main-grid">${spotlightHtml}${pitcherHtml}${hitterHtml}${hotColdHtml}${homersHtml}${callHtml}${statHtml}</div>`;
 }
 
 function renderStandings() {
   const el = document.getElementById('bottomStandings');
   const items = state.standings.map(s => {
     if (s.team === '|') return `<span style="color:var(--border);font-size:14px">|</span>`;
-    return `<div class="standing-item">
-      <span class="standing-rank">${s.rank}.</span>
-      <span class="standing-team">${s.team}</span>
-      <span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : s.gb === '—' ? 'var(--white-muted)' : 'var(--white-dim)'}">${s.gb}</span>
-    </div>`;
+    return `<div class="standing-item"><span class="standing-rank">${s.rank}.</span><span class="standing-team">${s.team}</span><span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : s.gb === '—' ? 'var(--white-muted)' : 'var(--white-dim)'}">${s.gb}</span></div>`;
   }).join('');
   el.innerHTML = items + items;
   el.classList.add('ticker');
 }
 
-// -- Interactions --
+async function setSpotlight(gamePk) { spotlightGamePk = spotlightGamePk === gamePk ? null : gamePk; spotlightLineScore = null; spotlightPlays = []; renderSidebar(state.games); renderMain(); if (spotlightGamePk) { await fetchSpotlightData(spotlightGamePk); renderMain(); } }
+function setCallStatus(status) { state.theCall.status = status; saveState(); renderMain(); }
 
-async function setSpotlight(gamePk) {
-  spotlightGamePk = spotlightGamePk === gamePk ? null : gamePk;
-  spotlightLineScore = null;
-  spotlightPlays = [];
-  renderSidebar(state.games);
-  renderMain();
-  if (spotlightGamePk) {
-    await fetchSpotlightData(spotlightGamePk);
-    renderMain();
-  }
-}
-
-function setCallStatus(status) {
-  state.theCall.status = status;
-  saveState();
-  renderMain();
-}
-
-let editingCall = false;
-let editingStat = false;
-
-function editTheCall() {
-  editingCall = true;
-  renderMain();
-  const el = document.getElementById('callEditInput');
-  if (el) el.focus();
-}
-
-function saveTheCall() {
-  const el = document.getElementById('callEditInput');
-  if (el && el.value.trim()) {
-    state.theCall.text = el.value.trim();
-    state.theCall.status = 'pending';
-  }
-  editingCall = false;
-  saveState();
-  renderMain();
-}
-
+let editingCall = false, editingStat = false;
+function editTheCall() { editingCall = true; renderMain(); const el = document.getElementById('callEditInput'); if (el) el.focus(); }
+function saveTheCall() { const el = document.getElementById('callEditInput'); if (el && el.value.trim()) { state.theCall.text = el.value.trim(); state.theCall.status = 'pending'; } editingCall = false; saveState(); renderMain(); }
 function cancelCallEdit() { editingCall = false; renderMain(); }
-
-function editStatOfDay() {
-  editingStat = true;
-  renderMain();
-  const el = document.getElementById('statEditNumber');
-  if (el) el.focus();
-}
-
-function saveStatOfDay() {
-  const num = document.getElementById('statEditNumber');
-  const unit = document.getElementById('statEditUnit');
-  const desc = document.getElementById('statEditDesc');
-  if (num) state.statOfDay.number = num.value || state.statOfDay.number;
-  if (unit) state.statOfDay.unit = unit.value || '';
-  if (desc) state.statOfDay.desc = desc.value || state.statOfDay.desc;
-  editingStat = false;
-  saveState();
-  renderMain();
-}
-
+function editStatOfDay() { editingStat = true; renderMain(); const el = document.getElementById('statEditNumber'); if (el) el.focus(); }
+function saveStatOfDay() { const num = document.getElementById('statEditNumber'); const unit = document.getElementById('statEditUnit'); const desc = document.getElementById('statEditDesc'); if (num) state.statOfDay.number = num.value || state.statOfDay.number; if (unit) state.statOfDay.unit = unit.value || ''; if (desc) state.statOfDay.desc = desc.value || state.statOfDay.desc; editingStat = false; saveState(); renderMain(); }
 function cancelStatEdit() { editingStat = false; renderMain(); }
 
-// -- Player Search --
 let searchMode = 'hitter';
-
-function openPlayerSearch(mode) {
-  searchMode = mode;
-  document.getElementById('searchTitle').textContent = `Set ${mode === 'pitcher' ? 'Pitcher' : 'Hitter'} of the Day`;
-  document.getElementById('playerSearchOverlay').classList.add('active');
-  const input = document.getElementById('playerSearchInput');
-  input.value = '';
-  input.focus();
-  renderSearchResults('');
-}
-
-function closePlayerSearch() {
-  document.getElementById('playerSearchOverlay').classList.remove('active');
-}
+function openPlayerSearch(mode) { searchMode = mode; document.getElementById('searchTitle').textContent = `Set ${mode === 'pitcher' ? 'Pitcher' : 'Hitter'} of the Day`; document.getElementById('playerSearchOverlay').classList.add('active'); const input = document.getElementById('playerSearchInput'); input.value = ''; input.focus(); renderSearchResults(''); }
+function closePlayerSearch() { document.getElementById('playerSearchOverlay').classList.remove('active'); }
 
 function renderSearchResults(query) {
   const el = document.getElementById('playerSearchResults');
-  if (!PLAYER_DB.length) {
-    el.innerHTML = '<div style="padding:12px;color:var(--white-dim);text-align:center;font-size:13px">Loading players...</div>';
-    return;
-  }
+  if (!PLAYER_DB.length) { el.innerHTML = '<div style="padding:12px;color:var(--white-dim);text-align:center;font-size:13px">Loading players...</div>'; return; }
   const q = (query || '').toLowerCase();
-  let results = PLAYER_DB.filter(p => {
-    const matchType = searchMode === 'pitcher' ? p.type === 'pitcher' : p.type === 'hitter';
-    const matchQuery = !q || p.name.toLowerCase().includes(q);
-    return matchType && matchQuery;
-  });
-  if (!q) results = results.slice(0, 25);
-  else results = results.slice(0, 40);
+  let results = PLAYER_DB.filter(p => { const matchType = searchMode === 'pitcher' ? p.type === 'pitcher' : p.type === 'hitter'; return matchType && (!q || p.name.toLowerCase().includes(q)); });
+  if (!q) results = results.slice(0, 25); else results = results.slice(0, 40);
   const countLabel = playerDBLoaded ? `${PLAYER_DB.filter(p => searchMode === 'pitcher' ? p.type === 'pitcher' : p.type === 'hitter').length} players available` : '';
   el.innerHTML = (countLabel && !q ? `<div style="padding:4px 10px 8px;font-size:10px;color:var(--white-dim);letter-spacing:0.5px">${countLabel} — type to search</div>` : '') +
-    results.map(p => {
-      const safeName = p.name.replace(/'/g, "\\'");
-      return `<div class="player-search-result" onclick="selectPlayer(${p.id}, '${safeName}', '${p.team}', '${p.pos}')">
-        <span class="name">${p.name}</span>
-        <span class="meta">${p.team} · ${p.pos}</span>
-      </div>`;
-    }).join('');
+    results.map(p => { const safeName = p.name.replace(/'/g, "\\'"); return `<div class="player-search-result" onclick="selectPlayer(${p.id}, '${safeName}', '${p.team}', '${p.pos}')"><span class="name">${p.name}</span><span class="meta">${p.team} · ${p.pos}</span></div>`; }).join('');
 }
 
 async function selectPlayer(id, name, team, pos) {
   closePlayerSearch();
   const numFromDB = PLAYER_DB.find(p => p.id === id);
   const jersey = (numFromDB && numFromDB.number) ? numFromDB.number : '--';
-  if (searchMode === 'pitcher') {
-    state.pitcherOfDay = {
-      name, team, position: pos, number: jersey, playerId: id,
-      season: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
-      last7: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' },
-      tonight: null
-    };
-    renderMain();
-    await fetchPitcherStats(id);
-  } else {
-    state.hitterOfDay = {
-      name, team, position: pos, number: jersey, playerId: id,
-      season: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
-      last7: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' },
-      tonight: null
-    };
-    renderMain();
-    await fetchHitterStats(id);
-  }
-  try {
-    const pResp = await fetch(`${MLB_API}/people/${id}`);
-    if (pResp.ok) {
-      const pData = await pResp.json();
-      if (pData.people && pData.people[0]) {
-        const num = pData.people[0].primaryNumber || pData.people[0].jerseyNumber;
-        if (num) {
-          if (searchMode === 'pitcher' && state.pitcherOfDay) state.pitcherOfDay.number = num;
-          else if (state.hitterOfDay) state.hitterOfDay.number = num;
-          saveState();
-          renderMain();
-        }
-      }
-    }
-  } catch(e) {}
+  if (searchMode === 'pitcher') { state.pitcherOfDay = { name, team, position: pos, number: jersey, playerId: id, season: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' }, last7: { w: '-', l: '-', era: '-', ip: '-', k: '-', whip: '-', avg: '-' }, tonight: null }; renderMain(); await fetchPitcherStats(id); }
+  else { state.hitterOfDay = { name, team, position: pos, number: jersey, playerId: id, season: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' }, last7: { avg: '-', hr: '-', rbi: '-', ops: '-', sb: '-', woba: '-' }, tonight: null }; renderMain(); await fetchHitterStats(id); }
+  try { const pResp = await fetch(`${MLB_API}/people/${id}`); if (pResp.ok) { const pData = await pResp.json(); if (pData.people && pData.people[0]) { const num = pData.people[0].primaryNumber || pData.people[0].jerseyNumber; if (num) { if (searchMode === 'pitcher' && state.pitcherOfDay) state.pitcherOfDay.number = num; else if (state.hitterOfDay) state.hitterOfDay.number = num; saveState(); renderMain(); } } } } catch(e) {}
 }
 
 async function fetchHitterStats(playerId) {
   try {
     const season = new Date().getFullYear();
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateStr();
     const resp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=season&season=${season}&group=hitting`);
     const data = await resp.json();
-    if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) {
-      const s = data.stats[0].splits[0].stat;
-      state.hitterOfDay.season = {
-        avg: s.avg || '-', hr: s.homeRuns ?? '-', rbi: s.rbi ?? '-',
-        ops: s.ops || '-', sb: s.stolenBases ?? '-', woba: s.obp || '-'
-      };
-      renderMain();
-    }
+    if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) { const s = data.stats[0].splits[0].stat; state.hitterOfDay.season = { avg: s.avg || '-', hr: s.homeRuns ?? '-', rbi: s.rbi ?? '-', ops: s.ops || '-', sb: s.stolenBases ?? '-', woba: s.obp || '-' }; renderMain(); }
     const glResp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=hitting`);
     const glData = await glResp.json();
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
       const splits = glData.stats[0].splits;
       const last7 = splits.slice(-7);
-      if (last7.length > 0) {
-        let ab=0, h=0, hr=0, rbi=0, bb=0, sb=0, tb=0;
-        last7.forEach(g => {
-          const s = g.stat;
-          ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0;
-          rbi += s.rbi||0; bb += s.baseOnBalls||0; sb += s.stolenBases||0;
-          tb += s.totalBases||0;
-        });
-        state.hitterOfDay.last7 = {
-          avg: ab > 0 ? (h/ab).toFixed(3) : '-', hr, rbi,
-          ops: ab > 0 ? ((h+bb)/(ab+bb) + tb/ab).toFixed(3) : '-', sb, woba: '-'
-        };
-      }
+      if (last7.length > 0) { let ab=0, h=0, hr=0, rbi=0, bb=0, sb=0, tb=0; last7.forEach(g => { const s = g.stat; ab += s.atBats||0; h += s.hits||0; hr += s.homeRuns||0; rbi += s.rbi||0; bb += s.baseOnBalls||0; sb += s.stolenBases||0; tb += s.totalBases||0; }); state.hitterOfDay.last7 = { avg: ab > 0 ? (h/ab).toFixed(3) : '-', hr, rbi, ops: ab > 0 ? ((h+bb)/(ab+bb) + tb/ab).toFixed(3) : '-', sb, woba: '-' }; }
       const todayGame = splits.find(g => g.date === todayStr);
-      if (todayGame) {
-        const s = todayGame.stat;
-        state.hitterOfDay.tonight = {
-          ab: s.atBats ?? 0, h: s.hits ?? 0, hr: s.homeRuns ?? 0,
-          rbi: s.rbi ?? 0, bb: s.baseOnBalls ?? 0, k: s.strikeOuts ?? 0
-        };
-      }
+      if (todayGame) { const s = todayGame.stat; state.hitterOfDay.tonight = { ab: s.atBats ?? 0, h: s.hits ?? 0, hr: s.homeRuns ?? 0, rbi: s.rbi ?? 0, bb: s.baseOnBalls ?? 0, k: s.strikeOuts ?? 0 }; }
       renderMain();
     }
   } catch(e) { console.log('Stats fetch failed:', e); }
@@ -1998,104 +836,50 @@ async function fetchHitterStats(playerId) {
 async function fetchPitcherStats(playerId) {
   try {
     const season = new Date().getFullYear();
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateStr();
     const resp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=season&season=${season}&group=pitching`);
     const data = await resp.json();
-    if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) {
-      const s = data.stats[0].splits[0].stat;
-      state.pitcherOfDay.season = {
-        w: s.wins ?? '-', l: s.losses ?? '-', era: s.era || '-',
-        ip: s.inningsPitched || '-', k: s.strikeOuts ?? '-',
-        whip: s.whip || '-', avg: s.avg || '-'
-      };
-      renderMain();
-    }
+    if (data.stats && data.stats[0] && data.stats[0].splits && data.stats[0].splits[0]) { const s = data.stats[0].splits[0].stat; state.pitcherOfDay.season = { w: s.wins ?? '-', l: s.losses ?? '-', era: s.era || '-', ip: s.inningsPitched || '-', k: s.strikeOuts ?? '-', whip: s.whip || '-', avg: s.avg || '-' }; renderMain(); }
     const glResp = await fetch(`${MLB_API}/people/${playerId}/stats?stats=gameLog&season=${season}&group=pitching`);
     const glData = await glResp.json();
     if (glData.stats && glData.stats[0] && glData.stats[0].splits) {
       const splits = glData.stats[0].splits;
       const last7days = splits.slice(-3);
-      if (last7days.length > 0) {
-        let w=0, l=0, ip=0, k=0, bb=0, er=0, hits=0;
-        last7days.forEach(g => {
-          const s = g.stat;
-          w += s.wins||0; l += s.losses||0;
-          ip += parseFloat(s.inningsPitched||0); k += s.strikeOuts||0;
-          er += s.earnedRuns||0; bb += s.baseOnBalls||0; hits += s.hits||0;
-        });
-        state.pitcherOfDay.last7 = {
-          w, l, era: ip > 0 ? ((er / ip) * 9).toFixed(2) : '-',
-          ip: ip.toFixed(1), k, whip: ip > 0 ? ((hits + bb) / ip).toFixed(2) : '-', avg: '-'
-        };
-      }
+      if (last7days.length > 0) { let w=0, l=0, ip=0, k=0, bb=0, er=0, hits=0; last7days.forEach(g => { const s = g.stat; w += s.wins||0; l += s.losses||0; ip += parseFloat(s.inningsPitched||0); k += s.strikeOuts||0; er += s.earnedRuns||0; bb += s.baseOnBalls||0; hits += s.hits||0; }); state.pitcherOfDay.last7 = { w, l, era: ip > 0 ? ((er / ip) * 9).toFixed(2) : '-', ip: ip.toFixed(1), k, whip: ip > 0 ? ((hits + bb) / ip).toFixed(2) : '-', avg: '-' }; }
       const todayGame = splits.find(g => g.date === todayStr);
-      if (todayGame) {
-        const s = todayGame.stat;
-        state.pitcherOfDay.tonight = {
-          ip: s.inningsPitched || '0', h: s.hits ?? 0, r: s.runs ?? 0,
-          er: s.earnedRuns ?? 0, k: s.strikeOuts ?? 0, bb: s.baseOnBalls ?? 0
-        };
-      }
+      if (todayGame) { const s = todayGame.stat; state.pitcherOfDay.tonight = { ip: s.inningsPitched || '0', h: s.hits ?? 0, r: s.runs ?? 0, er: s.earnedRuns ?? 0, k: s.strikeOuts ?? 0, bb: s.baseOnBalls ?? 0 }; }
       renderMain();
     }
   } catch(e) { console.log('Stats fetch failed:', e); }
 }
 
-document.getElementById('playerSearchInput').addEventListener('input', (e) => {
-  renderSearchResults(e.target.value);
-});
-
-document.getElementById('playerSearchOverlay').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) closePlayerSearch();
-});
+document.getElementById('playerSearchInput').addEventListener('input', (e) => { renderSearchResults(e.target.value); });
+document.getElementById('playerSearchOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closePlayerSearch(); });
 
 async function refreshData() {
-  const btn = document.getElementById('refreshBtn');
-  btn.textContent = '...';
-  const apiGames = await tryAPI();
-  if (apiGames) state.games = apiGames;
+  const btn = document.getElementById('refreshBtn'); btn.textContent = '...';
+  const apiGames = await tryAPI(); if (apiGames) state.games = apiGames;
   fetchPitcherEras();
   await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
-  renderSidebar(state.games);
-  renderMain();
-  btn.textContent = 'Refresh';
+  renderSidebar(state.games); renderMain(); btn.textContent = 'Refresh';
 }
 
 setInterval(async () => {
   const apiGames = await tryAPI();
-  if (apiGames) {
-    state.games = apiGames;
-    fetchPitcherEras();
-    await Promise.all([fetchLatestHomers(), fetchStandings()]);
-    renderSidebar(state.games);
-    if (!editingCall && !editingStat) renderMain();
-  }
+  if (apiGames) { state.games = apiGames; fetchPitcherEras(); await Promise.all([fetchLatestHomers(), fetchStandings()]); renderSidebar(state.games); if (!editingCall && !editingStat) renderMain(); }
 }, 15000);
 
 async function init() {
   const mock = getMockPlayerData();
-  state.pitcherOfDay = mock.pitcherOfDay;
-  state.hitterOfDay = mock.hitterOfDay;
-  state.hotPlayers = mock.hotPlayers;
-  state.coldPlayers = mock.coldPlayers;
-  state.standings = mock.standings;
-  state.latestHomers = mock.latestHomers || [];
-
+  state.pitcherOfDay = mock.pitcherOfDay; state.hitterOfDay = mock.hitterOfDay;
+  state.hotPlayers = mock.hotPlayers; state.coldPlayers = mock.coldPlayers;
+  state.standings = mock.standings; state.latestHomers = mock.latestHomers || [];
   loadSavedState();
-
-  await loadTeamAbbrevs();
-  loadFullPlayerDB();
-
+  await loadTeamAbbrevs(); loadFullPlayerDB();
   const apiGames = await tryAPI();
   state.games = apiGames || getMockGames();
-  if (useAPI) {
-    fetchPitcherEras();
-    await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
-  }
-
-  renderSidebar(state.games);
-  renderMain();
-  renderStandings();
+  if (useAPI) { fetchPitcherEras(); await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]); }
+  renderSidebar(state.games); renderMain(); renderStandings();
 }
 
 init();
