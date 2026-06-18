@@ -186,7 +186,7 @@ textarea.editable-input { resize: vertical; min-height: 48px; }
 .spotlight-team-name { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
 .spotlight-team-record { font-size: 11px; color: var(--white-dim); }
 .spotlight-score { font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
-.spotlight-detail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+.spotlight-detail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
 .spotlight-detail-item { text-align: center; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 6px; }
 .spotlight-detail-label { font-size: 10px; color: var(--white-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .spotlight-detail-value { font-size: 15px; font-weight: 700; }
@@ -262,6 +262,15 @@ body.stream-mode .controls { display: none; }
 .play-item .play-inning { font-size: 10px; color: var(--white-dim); margin-right: 6px; }
 
 .auto-rotate-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--green-light); background: rgba(30,122,58,0.15); padding: 2px 8px; border-radius: 3px; margin-left: 8px; }
+
+@keyframes scoreFlash { 0% { color: var(--white); text-shadow: none; } 20% { color: #22c55e; text-shadow: 0 0 12px rgba(34,197,94,0.6); } 100% { color: var(--white); text-shadow: none; } }
+.score-flash { animation: scoreFlash 1.5s ease-out; }
+
+.count-display { display: flex; gap: 3px; align-items: center; margin-left: 6px; }
+.count-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+.count-dot.ball-on { background: var(--live-green); border-color: var(--live-green); }
+.count-dot.strike-on { background: var(--hot-color); border-color: var(--hot-color); }
+.count-text { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--white-muted); margin-left: 4px; }
 </style>
 </head>
 <body>
@@ -370,15 +379,16 @@ function parseAPIGames(apiGames) {
     const away = g.teams.away;
     const home = g.teams.home;
     const statusCode = g.status.statusCode;
+    const abstractState = g.status.abstractGameState;
     let status = 'Pre-Game';
     let statusClass = 'pre';
-    if (['I','MA','MB','MC','MD','ME','MF','MG','MH'].includes(statusCode) || statusCode === 'IP') {
+    if (abstractState === 'Live') {
       status = `${ls.inningHalf === 'Top' ? 'Top' : 'Bot'} ${ls.currentInning}`;
       statusClass = 'live';
-    } else if (['F','FT','FR','FO','DR'].includes(statusCode)) {
+    } else if (abstractState === 'Final') {
       status = ls.currentInning > 9 ? `Final/${ls.currentInning}` : 'Final';
       statusClass = 'final';
-    } else if (statusCode === 'S' || statusCode === 'PW') {
+    } else {
       const t = new Date(g.gameDate);
       status = t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       statusClass = 'pre';
@@ -393,6 +403,8 @@ function parseAPIGames(apiGames) {
       inning: ls.currentInning || 0,
       outs: ls.outs || 0,
       runners: { first: !!(ls.offense && ls.offense.first), second: !!(ls.offense && ls.offense.second), third: !!(ls.offense && ls.offense.third) },
+      balls: ls.balls ?? 0,
+      strikes: ls.strikes ?? 0,
       awayPitcher: awayPP ? awayPP.lastFirstName || awayPP.fullName || '' : '',
       homePitcher: homePP ? homePP.lastFirstName || homePP.fullName || '' : '',
       awayPitcherId: awayPP ? awayPP.id : null,
@@ -557,21 +569,21 @@ async function fetchStandings() {
 
 function getMockGames() {
   return [
-    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G', awayPitcherEra: '2.95', homePitcherEra: '3.82' },
-    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false }, awayPitcher: 'Glasnow, T', homePitcher: 'Webb, L', awayPitcherEra: '3.12', homePitcherEra: '3.45' },
-    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false }, awayPitcher: 'Strider, S', homePitcher: 'Severino, L', awayPitcherEra: '2.78', homePitcherEra: '3.65' },
-    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Verlander, J', homePitcher: 'Scherzer, M', awayPitcherEra: '3.28', homePitcherEra: '3.92' },
-    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Wheeler, Z', homePitcher: 'Cabrera, E', awayPitcherEra: '2.45', homePitcherEra: '4.88' },
-    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true }, awayPitcher: 'Cease, D', homePitcher: 'Gallen, Z', awayPitcherEra: '3.55', homePitcherEra: '3.18' },
-    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Bibee, T', homePitcher: 'Skubal, T', awayPitcherEra: '3.42', homePitcherEra: '2.15' },
-    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Burnes, C', homePitcher: 'Pepiot, R', awayPitcherEra: '2.88', homePitcherEra: '4.12' },
-    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Paddack, C', homePitcher: 'Crochet, G', awayPitcherEra: '4.15', homePitcherEra: '3.72' },
-    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, awayPitcher: 'Peralta, F', homePitcher: 'Hendricks, K', awayPitcherEra: '3.35', homePitcherEra: '4.22' },
-    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gilbert, L', homePitcher: 'Detmers, R', awayPitcherEra: '2.98', homePitcherEra: '4.55' },
-    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false }, awayPitcher: 'Skenes, P', homePitcher: 'Greene, H', awayPitcherEra: '1.89', homePitcherEra: '3.48' },
-    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true }, awayPitcher: 'Mikolas, M', homePitcher: 'Singer, B', awayPitcherEra: '4.65', homePitcherEra: '3.22' },
-    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, awayPitcher: 'Berrios, J', homePitcher: 'Gray, J', awayPitcherEra: '3.78', homePitcherEra: '3.95' },
-    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, awayPitcher: 'Gomber, A', homePitcher: 'Waldichuk, K', awayPitcherEra: '5.12', homePitcherEra: '5.45' },
+    { gamePk: 1, away: { abbr: 'NYY', name: 'Yankees', record: '47-22', score: 5 }, home: { abbr: 'BOS', name: 'Red Sox', record: '38-30', score: 3 }, status: 'Top 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, balls: 2, strikes: 1, awayPitcher: 'Cole, G', homePitcher: 'Whitlock, G', awayPitcherEra: '2.95', homePitcherEra: '3.82' },
+    { gamePk: 2, away: { abbr: 'LAD', name: 'Dodgers', record: '48-20', score: 7 }, home: { abbr: 'SF', name: 'Giants', record: '35-33', score: 2 }, status: 'Bot 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: true, third: false }, balls: 0, strikes: 0, awayPitcher: 'Glasnow, T', homePitcher: 'Webb, L', awayPitcherEra: '3.12', homePitcherEra: '3.45' },
+    { gamePk: 3, away: { abbr: 'ATL', name: 'Braves', record: '41-27', score: 4 }, home: { abbr: 'NYM', name: 'Mets', record: '39-29', score: 4 }, status: 'Top 8', statusClass: 'live', inning: 8, outs: 0, runners: { first: true, second: true, third: false }, balls: 0, strikes: 0, awayPitcher: 'Strider, S', homePitcher: 'Severino, L', awayPitcherEra: '2.78', homePitcherEra: '3.65' },
+    { gamePk: 4, away: { abbr: 'HOU', name: 'Astros', record: '40-28', score: 1 }, home: { abbr: 'TEX', name: 'Rangers', record: '36-32', score: 0 }, status: 'Bot 3', statusClass: 'live', inning: 3, outs: 2, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Verlander, J', homePitcher: 'Scherzer, M', awayPitcherEra: '3.28', homePitcherEra: '3.92' },
+    { gamePk: 5, away: { abbr: 'PHI', name: 'Phillies', record: '43-25', score: 6 }, home: { abbr: 'MIA', name: 'Marlins', record: '24-44', score: 1 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Wheeler, Z', homePitcher: 'Cabrera, E', awayPitcherEra: '2.45', homePitcherEra: '4.88' },
+    { gamePk: 6, away: { abbr: 'SD', name: 'Padres', record: '39-29', score: 3 }, home: { abbr: 'ARI', name: 'D-backs', record: '37-31', score: 3 }, status: 'Top 5', statusClass: 'live', inning: 5, outs: 1, runners: { first: false, second: false, third: true }, balls: 0, strikes: 0, awayPitcher: 'Cease, D', homePitcher: 'Gallen, Z', awayPitcherEra: '3.55', homePitcherEra: '3.18' },
+    { gamePk: 7, away: { abbr: 'CLE', name: 'Guardians', record: '42-26', score: 2 }, home: { abbr: 'DET', name: 'Tigers', record: '33-35', score: 0 }, status: 'Bot 4', statusClass: 'live', inning: 4, outs: 0, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Bibee, T', homePitcher: 'Skubal, T', awayPitcherEra: '3.42', homePitcherEra: '2.15' },
+    { gamePk: 8, away: { abbr: 'BAL', name: 'Orioles', record: '44-24', score: 8 }, home: { abbr: 'TB', name: 'Rays', record: '34-34', score: 5 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Burnes, C', homePitcher: 'Pepiot, R', awayPitcherEra: '2.88', homePitcherEra: '4.12' },
+    { gamePk: 9, away: { abbr: 'MIN', name: 'Twins', record: '38-30', score: 0 }, home: { abbr: 'CWS', name: 'White Sox', record: '18-50', score: 0 }, status: '7:10 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Paddack, C', homePitcher: 'Crochet, G', awayPitcherEra: '4.15', homePitcherEra: '3.72' },
+    { gamePk: 10, away: { abbr: 'MIL', name: 'Brewers', record: '41-27', score: 2 }, home: { abbr: 'CHC', name: 'Cubs', record: '36-32', score: 4 }, status: 'Bot 7', statusClass: 'live', inning: 7, outs: 1, runners: { first: true, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Peralta, F', homePitcher: 'Hendricks, K', awayPitcherEra: '3.35', homePitcherEra: '4.22' },
+    { gamePk: 11, away: { abbr: 'SEA', name: 'Mariners', record: '37-31', score: 0 }, home: { abbr: 'LAA', name: 'Angels', record: '30-38', score: 0 }, status: '9:40 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Gilbert, L', homePitcher: 'Detmers, R', awayPitcherEra: '2.98', homePitcherEra: '4.55' },
+    { gamePk: 12, away: { abbr: 'PIT', name: 'Pirates', record: '36-32', score: 3 }, home: { abbr: 'CIN', name: 'Reds', record: '34-34', score: 1 }, status: 'Top 6', statusClass: 'live', inning: 6, outs: 2, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Skenes, P', homePitcher: 'Greene, H', awayPitcherEra: '1.89', homePitcherEra: '3.48' },
+    { gamePk: 13, away: { abbr: 'STL', name: 'Cardinals', record: '32-36', score: 1 }, home: { abbr: 'KC', name: 'Royals', record: '40-28', score: 5 }, status: 'Bot 8', statusClass: 'live', inning: 8, outs: 1, runners: { first: false, second: true, third: true }, balls: 0, strikes: 0, awayPitcher: 'Mikolas, M', homePitcher: 'Singer, B', awayPitcherEra: '4.65', homePitcherEra: '3.22' },
+    { gamePk: 14, away: { abbr: 'TOR', name: 'Blue Jays', record: '35-33', score: 2 }, home: { abbr: 'WSH', name: 'Nationals', record: '29-39', score: 3 }, status: 'Final', statusClass: 'final', inning: 9, outs: 3, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Berrios, J', homePitcher: 'Gray, J', awayPitcherEra: '3.78', homePitcherEra: '3.95' },
+    { gamePk: 15, away: { abbr: 'COL', name: 'Rockies', record: '22-46', score: 0 }, home: { abbr: 'OAK', name: 'Athletics', record: '25-43', score: 0 }, status: '9:07 PM', statusClass: 'pre', inning: 0, outs: 0, runners: { first: false, second: false, third: false }, balls: 0, strikes: 0, awayPitcher: 'Gomber, A', homePitcher: 'Waldichuk, K', awayPitcherEra: '5.12', homePitcherEra: '5.45' },
   ];
 }
 
@@ -681,6 +693,29 @@ async function fetchSpotlightData(gamePk) {
   try { const r = await fetch(`${MLB_API}/game/${gamePk}/playByPlay`); if (r.ok) { const d = await r.json(); if (d.allPlays) spotlightPlays = d.allPlays.filter(p => p.result && p.result.description).slice(-8).reverse(); } } catch(e) { spotlightPlays = []; }
 }
 
+let prevScores = {};
+function trackScoreChanges(games) {
+  const changed = new Set();
+  games.forEach(g => {
+    const key = g.gamePk;
+    const prev = prevScores[key];
+    if (prev && (prev.away !== g.away.score || prev.home !== g.home.score)) {
+      changed.add(key);
+    }
+    prevScores[key] = { away: g.away.score, home: g.home.score };
+  });
+  return changed;
+}
+
+function renderCount(balls, strikes) {
+  let html = '<div class="count-display">';
+  for (let i = 0; i < 4; i++) html += `<span class="count-dot ${i < balls ? 'ball-on' : ''}"></span>`;
+  html += '<span style="width:4px"></span>';
+  for (let i = 0; i < 3; i++) html += `<span class="count-dot ${i < strikes ? 'strike-on' : ''}"></span>`;
+  html += `<span class="count-text">${balls}-${strikes}</span></div>`;
+  return html;
+}
+
 function renderRunners(runners, size) {
   const s = size || 28; const ds = Math.round(s * 0.24); const spread = Math.round(s * 0.27); const cx = s / 2; const cy = s / 2;
   const bases = [ { x: cx, y: cy - spread, on: runners.second }, { x: cx + spread, y: cy, on: runners.first }, { x: cx - spread, y: cy, on: runners.third } ];
@@ -689,8 +724,9 @@ function renderRunners(runners, size) {
 
 function shortenPitcher(name) { if (!name) return ''; const parts = name.split(', '); if (parts.length === 2) return parts[0]; const space = name.lastIndexOf(' '); if (space > 0) return name.substring(space + 1); return name; }
 
-function renderSidebar(games) {
+function renderSidebar(games, scoreChanges) {
   const sidebar = document.getElementById('sidebar');
+  const flashed = scoreChanges || new Set();
   let html = `<div class="sidebar-header"><span>All Games</span><span class="game-count">${games.length}</span></div>`;
   const sorted = [...games].sort((a,b) => { const order = { live: 0, final: 1, pre: 2 }; return (order[a.statusClass] ?? 2) - (order[b.statusClass] ?? 2); });
   for (const g of sorted) {
@@ -698,15 +734,17 @@ function renderSidebar(games) {
     const awayWin = g.statusClass === 'final' && g.away.score > g.home.score;
     const homeWin = g.statusClass === 'final' && g.home.score > g.away.score;
     const isLive = g.statusClass === 'live';
+    const flash = flashed.has(g.gamePk) ? ' score-flash' : '';
     const awayP = shortenPitcher(g.awayPitcher); const homeP = shortenPitcher(g.homePitcher);
     const awayEra = g.awayPitcherEra ? `<span class="${eraClass(g.awayPitcherEra)}" style="font-size:10px;font-weight:700"> ${g.awayPitcherEra}</span>` : '';
     const homeEra = g.homePitcherEra ? `<span class="${eraClass(g.homePitcherEra)}" style="font-size:10px;font-weight:700"> ${g.homePitcherEra}</span>` : '';
     const pitcherLine = (awayP || homeP) ? `${awayP}${awayEra} vs ${homeP}${homeEra}` : '';
+    const countHtml = isLive ? renderCount(g.balls, g.strikes) : '';
     html += `<div class="game-card ${isActive ? 'active' : ''}" onclick="setSpotlight(${g.gamePk})">
-      <div class="game-status ${g.statusClass}">${isLive ? '<span class="live-dot"></span>' : ''} ${g.status} ${isLive ? ` · ${g.outs} out` : ''}</div>
+      <div class="game-status ${g.statusClass}">${isLive ? '<span class="live-dot"></span>' : ''} ${g.status} ${isLive ? ` · ${g.outs} out` : ''}${countHtml}</div>
       <div class="game-teams">
-        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.away.abbr}</span><span class="team-record">${g.away.record}</span></div><span class="team-score ${awayWin ? 'winner' : ''}">${g.away.score}</span></div>
-        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.home.abbr}</span><span class="team-record">${g.home.record}</span></div><span class="team-score ${homeWin ? 'winner' : ''}">${g.home.score}</span></div>
+        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.away.abbr}</span><span class="team-record">${g.away.record}</span></div><span class="team-score${awayWin ? ' winner' : ''}${flash}">${g.away.score}</span></div>
+        <div class="game-team-row"><div class="team-info"><span class="team-abbr">${g.home.abbr}</span><span class="team-record">${g.home.record}</span></div><span class="team-score${homeWin ? ' winner' : ''}${flash}">${g.home.score}</span></div>
       </div>
       <div class="game-meta"><span class="game-pitchers">${pitcherLine}</span>${isLive ? `<div class="game-runners-wrap">${renderRunners(g.runners, 26)}</div>` : ''}</div>
     </div>`;
@@ -732,7 +770,7 @@ function renderMain() {
       if (spotlightPlays.length) { playsHtml = `<div class="play-feed">${spotlightPlays.map(play => { const isScoring = play.result.event === 'Home Run' || (play.result.rbi && play.result.rbi > 0); const inn = play.about ? `${play.about.halfInning === 'top' ? 'T' : 'B'}${play.about.inning}` : ''; return `<div class="play-item ${isScoring ? 'scoring' : ''}"><span class="play-inning">${inn}</span>${play.result.description}</div>`; }).join('')}</div>`; }
       spotlightHtml = `<div class="card spotlight-card"><div class="card-header"><span class="card-label">Game Spotlight${autoRotateInterval ? '<span class="auto-rotate-badge"><span class="live-dot"></span>Auto</span>' : ''}</span><span class="card-badge green">${g.status}</span></div><div class="card-body">
         <div class="spotlight-matchup"><div class="spotlight-team"><div class="spotlight-team-name">${g.away.name}</div><div class="spotlight-team-record">${g.away.record}</div></div><div class="spotlight-score">${g.away.score} - ${g.home.score}</div><div class="spotlight-team"><div class="spotlight-team-name">${g.home.name}</div><div class="spotlight-team-record">${g.home.record}</div></div></div>
-        <div class="spotlight-detail"><div class="spotlight-detail-item"><div class="spotlight-detail-label">Inning</div><div class="spotlight-detail-value">${g.status}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Outs</div><div class="spotlight-detail-value">${g.outs}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Bases</div><div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div></div></div>
+        <div class="spotlight-detail"><div class="spotlight-detail-item"><div class="spotlight-detail-label">Inning</div><div class="spotlight-detail-value">${g.status}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Count</div><div class="spotlight-detail-value">${g.statusClass === 'live' ? `<span style="font-variant-numeric:tabular-nums">${g.balls}-${g.strikes}</span>` : '—'}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Outs</div><div class="spotlight-detail-value">${g.outs}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Bases</div><div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div></div></div>
         ${(g.statusClass === 'live' && (spotlightMatchup.pitcher || spotlightMatchup.batter)) ? `<div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:12px;padding:10px 16px;background:rgba(255,255,255,0.03);border-radius:8px">
           <div style="text-align:center"><div style="font-size:10px;color:var(--white-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Pitching</div><div style="font-size:15px;font-weight:700">${spotlightMatchup.pitcher || '—'}</div></div>
           <div style="font-size:11px;color:var(--white-dim);font-weight:600">vs</div>
@@ -927,7 +965,7 @@ async function refreshData() {
 
 setInterval(async () => {
   const apiGames = await tryAPI();
-  if (apiGames) { state.games = apiGames; fetchPitcherEras(); const extraTasks = [fetchLatestHomers(), fetchStandings(), refreshTonightStats()]; if (spotlightGamePk) extraTasks.push(fetchSpotlightData(spotlightGamePk)); await Promise.all(extraTasks); renderSidebar(state.games); if (!editingCall && !editingStat) renderMain(); }
+  if (apiGames) { const scoreChanges = trackScoreChanges(apiGames); state.games = apiGames; fetchPitcherEras(); const extraTasks = [fetchLatestHomers(), fetchStandings(), refreshTonightStats()]; if (spotlightGamePk) extraTasks.push(fetchSpotlightData(spotlightGamePk)); await Promise.all(extraTasks); renderSidebar(state.games, scoreChanges); if (!editingCall && !editingStat) renderMain(); }
 }, 15000);
 
 async function init() {
