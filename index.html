@@ -215,7 +215,7 @@ textarea.editable-input { resize: vertical; min-height: 48px; }
 .standing-item { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .standing-rank { font-weight: 800; color: var(--white); font-size: 12px; }
 .standing-team { font-weight: 600; color: var(--white-muted); }
-.bottom-label { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green-light); white-space: nowrap; flex-shrink: 0; position: relative; z-index: 2; }
+.bottom-label { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green-light); white-space: nowrap; flex-shrink: 0; position: relative; z-index: 2; background: rgba(0,0,0,0.85); padding: 4px 16px 4px 0; margin-right: 4px; }
 
 .controls { position: fixed; top: 72px; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
 .ctrl-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--white-dim); padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; font-family: inherit; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; white-space: nowrap; }
@@ -663,9 +663,21 @@ function detectNewHomers() { const currentKeys = new Set(state.latestHomers.map(
 
 let spotlightLineScore = null;
 let spotlightPlays = [];
+let spotlightMatchup = { batter: null, pitcher: null };
 async function fetchSpotlightData(gamePk) {
-  if (!useAPI || !gamePk) { spotlightLineScore = null; spotlightPlays = []; return; }
-  try { const r = await fetch(`${MLB_API}/game/${gamePk}/linescore`); if (r.ok) spotlightLineScore = await r.json(); } catch(e) { spotlightLineScore = null; }
+  if (!useAPI || !gamePk) { spotlightLineScore = null; spotlightPlays = []; spotlightMatchup = { batter: null, pitcher: null }; return; }
+  try {
+    const r = await fetch(`${MLB_API}/game/${gamePk}/linescore`);
+    if (r.ok) {
+      spotlightLineScore = await r.json();
+      if (spotlightLineScore.offense && spotlightLineScore.offense.batter) {
+        spotlightMatchup.batter = spotlightLineScore.offense.batter.fullName || null;
+      } else { spotlightMatchup.batter = null; }
+      if (spotlightLineScore.defense && spotlightLineScore.defense.pitcher) {
+        spotlightMatchup.pitcher = spotlightLineScore.defense.pitcher.fullName || null;
+      } else { spotlightMatchup.pitcher = null; }
+    }
+  } catch(e) { spotlightLineScore = null; }
   try { const r = await fetch(`${MLB_API}/game/${gamePk}/playByPlay`); if (r.ok) { const d = await r.json(); if (d.allPlays) spotlightPlays = d.allPlays.filter(p => p.result && p.result.description).slice(-8).reverse(); } } catch(e) { spotlightPlays = []; }
 }
 
@@ -721,6 +733,11 @@ function renderMain() {
       spotlightHtml = `<div class="card spotlight-card"><div class="card-header"><span class="card-label">Game Spotlight${autoRotateInterval ? '<span class="auto-rotate-badge"><span class="live-dot"></span>Auto</span>' : ''}</span><span class="card-badge green">${g.status}</span></div><div class="card-body">
         <div class="spotlight-matchup"><div class="spotlight-team"><div class="spotlight-team-name">${g.away.name}</div><div class="spotlight-team-record">${g.away.record}</div></div><div class="spotlight-score">${g.away.score} - ${g.home.score}</div><div class="spotlight-team"><div class="spotlight-team-name">${g.home.name}</div><div class="spotlight-team-record">${g.home.record}</div></div></div>
         <div class="spotlight-detail"><div class="spotlight-detail-item"><div class="spotlight-detail-label">Inning</div><div class="spotlight-detail-value">${g.status}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Outs</div><div class="spotlight-detail-value">${g.outs}</div></div><div class="spotlight-detail-item"><div class="spotlight-detail-label">Bases</div><div class="spotlight-detail-value"><div class="spotlight-bases-wrap">${renderRunners(g.runners, 44)}</div></div></div></div>
+        ${(g.statusClass === 'live' && (spotlightMatchup.pitcher || spotlightMatchup.batter)) ? `<div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-top:12px;padding:10px 16px;background:rgba(255,255,255,0.03);border-radius:8px">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--white-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Pitching</div><div style="font-size:15px;font-weight:700">${spotlightMatchup.pitcher || '—'}</div></div>
+          <div style="font-size:11px;color:var(--white-dim);font-weight:600">vs</div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--white-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">At Bat</div><div style="font-size:15px;font-weight:700">${spotlightMatchup.batter || '—'}</div></div>
+        </div>` : ''}
         ${lineScoreHtml}${playsHtml}</div></div>`;
     }
   }
@@ -770,11 +787,19 @@ function renderMain() {
 
 function renderStandings() {
   const el = document.getElementById('bottomStandings');
-  const items = state.standings.map(s => {
-    if (s.team === '|') return `<span style="color:var(--border);font-size:14px">|</span>`;
+  const alItems = state.standings.filter((s,i) => { const sepIdx = state.standings.findIndex(x => x.team === '|'); return i < sepIdx; });
+  const nlItems = state.standings.filter((s,i) => { const sepIdx = state.standings.findIndex(x => x.team === '|'); return i > sepIdx; });
+  function renderItem(s) {
+    if (s.team === '|') return `<span style="color:var(--white-dim);font-size:14px;padding:0 6px">|</span>`;
     return `<div class="standing-item"><span class="standing-rank">${s.rank}.</span><span class="standing-team">${s.team}</span><span style="color:${s.gb.startsWith('+') ? 'var(--green-light)' : s.gb === '—' ? 'var(--white-muted)' : 'var(--white-dim)'}">${s.gb}</span></div>`;
-  }).join('');
-  el.innerHTML = items + items;
+  }
+  const alHtml = alItems.map(renderItem).join('');
+  const nlHtml = nlItems.map(renderItem).join('');
+  const sep = `<span style="color:var(--white-dim);font-size:14px;padding:0 6px">|</span>`;
+  const label = (league) => `<span style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--white-dim);text-transform:uppercase;padding:0 4px">${league}</span>`;
+  const oneSet = label('AL') + alHtml + sep + label('NL') + nlHtml;
+  const spacer = `<span style="padding:0 24px"></span>`;
+  el.innerHTML = oneSet + spacer + oneSet;
   el.classList.add('ticker');
 }
 
@@ -856,17 +881,53 @@ async function fetchPitcherStats(playerId) {
 document.getElementById('playerSearchInput').addEventListener('input', (e) => { renderSearchResults(e.target.value); });
 document.getElementById('playerSearchOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closePlayerSearch(); });
 
+async function refreshTonightStats() {
+  if (!useAPI) return;
+  const season = new Date().getFullYear();
+  const todayStr = getLocalDateStr();
+  if (state.hitterOfDay && state.hitterOfDay.playerId) {
+    try {
+      const r = await fetch(`${MLB_API}/people/${state.hitterOfDay.playerId}/stats?stats=gameLog&season=${season}&group=hitting`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.stats && d.stats[0] && d.stats[0].splits) {
+          const todayGame = d.stats[0].splits.find(g => g.date === todayStr);
+          if (todayGame) {
+            const s = todayGame.stat;
+            state.hitterOfDay.tonight = { ab: s.atBats ?? 0, h: s.hits ?? 0, hr: s.homeRuns ?? 0, rbi: s.rbi ?? 0, bb: s.baseOnBalls ?? 0, k: s.strikeOuts ?? 0 };
+          }
+        }
+      }
+    } catch(e) {}
+  }
+  if (state.pitcherOfDay && state.pitcherOfDay.playerId) {
+    try {
+      const r = await fetch(`${MLB_API}/people/${state.pitcherOfDay.playerId}/stats?stats=gameLog&season=${season}&group=pitching`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.stats && d.stats[0] && d.stats[0].splits) {
+          const todayGame = d.stats[0].splits.find(g => g.date === todayStr);
+          if (todayGame) {
+            const s = todayGame.stat;
+            state.pitcherOfDay.tonight = { ip: s.inningsPitched || '0', h: s.hits ?? 0, r: s.runs ?? 0, er: s.earnedRuns ?? 0, k: s.strikeOuts ?? 0, bb: s.baseOnBalls ?? 0 };
+          }
+        }
+      }
+    } catch(e) {}
+  }
+}
+
 async function refreshData() {
   const btn = document.getElementById('refreshBtn'); btn.textContent = '...';
   const apiGames = await tryAPI(); if (apiGames) state.games = apiGames;
   fetchPitcherEras();
-  await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings()]);
+  await Promise.all([fetchHotCold(), fetchLatestHomers(), fetchStandings(), refreshTonightStats()]);
   renderSidebar(state.games); renderMain(); btn.textContent = 'Refresh';
 }
 
 setInterval(async () => {
   const apiGames = await tryAPI();
-  if (apiGames) { state.games = apiGames; fetchPitcherEras(); await Promise.all([fetchLatestHomers(), fetchStandings()]); renderSidebar(state.games); if (!editingCall && !editingStat) renderMain(); }
+  if (apiGames) { state.games = apiGames; fetchPitcherEras(); const extraTasks = [fetchLatestHomers(), fetchStandings(), refreshTonightStats()]; if (spotlightGamePk) extraTasks.push(fetchSpotlightData(spotlightGamePk)); await Promise.all(extraTasks); renderSidebar(state.games); if (!editingCall && !editingStat) renderMain(); }
 }, 15000);
 
 async function init() {
