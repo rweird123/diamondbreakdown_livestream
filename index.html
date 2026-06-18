@@ -966,7 +966,7 @@ async function refreshData() {
 setInterval(async () => {
   const apiGames = await tryAPI();
   if (apiGames) { const scoreChanges = trackScoreChanges(apiGames); state.games = apiGames; fetchPitcherEras(); const extraTasks = [fetchLatestHomers(), fetchStandings(), refreshTonightStats()]; if (spotlightGamePk) extraTasks.push(fetchSpotlightData(spotlightGamePk)); await Promise.all(extraTasks); renderSidebar(state.games, scoreChanges); if (!editingCall && !editingStat) renderMain(); }
-}, 15000);
+}, 8000);
 
 async function init() {
   const mock = getMockPlayerData();
